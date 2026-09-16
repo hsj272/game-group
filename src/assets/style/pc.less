@@ -1,0 +1,188 @@
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+.pc {
+  font-feature-settings:
+    'tnum' on,
+    'lnum' on;
+  background-color: #0d131c;
+  color: white;
+  font-family:
+    Montserrat Variable,
+    sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.flex-scrollx {
+  flex: 1;
+  overflow-x: scroll;
+}
+.flex-scrolly {
+  flex: 1;
+  overflow-y: scroll;
+}
+.flex1 {
+  flex: 1;
+  overflow: hidden;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.row-center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.row-middle {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.col-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.col-middle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@font-face {
+  font-family: 'AlfaSlabOne';
+  src: url('/fonts/AlfaSlabOne-Regular-2.ttf') format('truetype');
+  font-weight: bold;
+  font-display: swap;
+}
+
+// 弹窗组件的样式
+.pc {
+  .top-layer {
+    position: fixed;
+    width: 100%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    top: 0;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.83);
+
+    .container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-radius: 10px;
+      padding-bottom: 50px;
+    }
+
+    .close {
+      color: #9f9b9b;
+      font-weight: 600;
+      font-size: 20px;
+      color: #9f9b9b;
+      line-height: 25px;
+      border-bottom: 1px solid #9f9b9b34;
+      // width: 350px;
+      text-align: center;
+      position: absolute;
+      cursor: pointer;
+      bottom: 0;
+    }
+  }
+}
+
+/* 蒙版淡入动画 */
+.fade-in {
+  animation: fadeInSlideUp 0.5s ease forwards; /* 进入动画：从底部到中间 */
+}
+
+/* 蒙版淡出动画（如果需要关闭时动画，可以使用） */
+.fade-out {
+  animation: fadeOutSlideDown 0.5s ease forwards;
+}
+
+/* 定义从底部滑动到中间的动画 */
+@keyframes fadeInSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%); /* 初始在底部 */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0); /* 最终在中间 */
+  }
+}
+
+/* 定义从中间滑动到底部的动画 */
+@keyframes fadeOutSlideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0); /* 初始在中间 */
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%); /* 最终滑到底部 */
+  }
+}
+
+button {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  margin: 0;
+}
+
+input {
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}
+
+h2 {
+  margin: 0;
+  padding: 0;
+}

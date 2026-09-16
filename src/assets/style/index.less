@@ -1,0 +1,193 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #13181f;
+  overflow: hidden; /* 防止横向滚动 */
+  font-family: Arial, sans-serif;
+  font-feature-settings:
+    'tnum' on,
+    'lnum' on;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
+  overscroll-behavior: none;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  max-width: 1242px; /* 强制最大宽度为手机尺寸 */
+  background-color: #13181f;
+  overflow: hidden;
+  overflow-y: auto;
+  font-family: Arial, sans-serif;
+  font-feature-settings:
+    'tnum' on,
+    'lnum' on;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}
+
+/* 适配较小的屏幕尺寸 */
+@media only screen and (max-width: 767px) {
+  #app {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
+@font-face {
+  font-family: 'Arial';
+  /* 选择一个字体名称 */
+  src: url('/fonts/Arial.ttf') format('truetype');
+  /* 字体文件的路径和格式 */
+}
+
+@font-face {
+  font-family: 'RobotoCondensed';
+  src: url('/fonts/RobotoCondensed-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'AlfaSlabOne';
+  src: url('/fonts/AlfaSlabOne-Regular-2.ttf') format('truetype');
+  font-weight: bold;
+  font-display: swap;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.row-center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.row-middle {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.col-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.col-middle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+// 弹窗组件的样式
+.top-layer {
+  position: fixed;
+  width: 100%;
+  max-width: 1244px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  top: 0;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.83);
+
+  .container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10px;
+    padding-bottom: 100px;
+  }
+
+  .close {
+    color: #9f9b9b;
+    font-weight: 600;
+    font-size: 44px;
+    color: #9f9b9b;
+    line-height: 75px;
+    border-bottom: 1px solid #9f9b9b34;
+    width: 350px;
+    text-align: center;
+    position: absolute;
+    cursor: pointer;
+    bottom: 0;
+  }
+}
+
+/* 蒙版淡入动画 */
+.fade-in {
+  animation: fadeInSlideUp 0.5s ease forwards; /* 进入动画：从底部到中间 */
+}
+
+/* 蒙版淡出动画（如果需要关闭时动画，可以使用） */
+.fade-out {
+  animation: fadeOutSlideDown 0.5s ease forwards;
+}
+
+/* 定义从底部滑动到中间的动画 */
+@keyframes fadeInSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%); /* 初始在底部 */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0); /* 最终在中间 */
+  }
+}
+
+/* 定义从中间滑动到底部的动画 */
+@keyframes fadeOutSlideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0); /* 初始在中间 */
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%); /* 最终滑到底部 */
+  }
+}
+
+:where(svg:not([fill])) {
+  fill: currentColor;
+}
+@media only screen and (max-width: 767px) {
+  .top-layer {
+    max-width: 100% !important;
+  }
+}
+
+input {
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
