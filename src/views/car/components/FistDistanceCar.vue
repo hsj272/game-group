@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import type { GetMatchInfoResp } from '@/views/api/protocol';
-import { ref, defineProps, defineEmits, type PropType, onMounted, onUnmounted } from 'vue';
+import { ref, type PropType, onMounted, onUnmounted } from 'vue';
 import { countdown } from '@/utils/index';
 import TslBtn from '@/components/TslBtn.vue';
 import cars from '@/views/car/components/cars';

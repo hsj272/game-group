@@ -31,7 +31,6 @@ const router = useRouter();
 const startGameData = ref<StartMatchResp>();
 let animationFrameId: number | null = null;
 const countdownTimer = ref(0);
-const raceDurationMs = ref(300_000);
 let pollTimer = 0;
 let racingSocket: RacingSocket | undefined;
 //游戏开始了
@@ -73,13 +72,12 @@ onMounted(async () => {
   if (!canvas) return;
   raceGame.value = new RaceGame(canvas);
   raceGame.value?.resetGame();
+  raceGame.value?.initTotalTime(21579);
   const mask = ~(1 << 31);
   soundManager.play(backgroundMusic, mask, false);
   try {
     const config = await fetchRacingConfig();
     dataCenter.bettingConfig.update(config);
-    raceDurationMs.value = config.racingTime;
-    raceGame.value?.initTotalTime(config.racingTime);
     await refreshGame();
   } catch (error) {
     tip.error(error instanceof Error ? error.message : 'Failed to load race');
@@ -180,11 +178,10 @@ function createAccurateCountdown(
   endTime: string,
   remainingTime: number,
   paihang: number[],
-  distancesRatio: number[][],
 
   onEnd?: () => void,
 ) {
-  const suduData = distancesRatio;
+  const suduData = generateSpeedArray(paihang);
   const endTimestamp = convertTime(endTime); // 结束时间的时间戳
   const startTimestamp = convertTime(endTime) - remainingTime; // 当前时间戳
   const targetTimestamp = Math.min(endTimestamp, startTimestamp + remainingTime); // 实际倒计时结束时间
@@ -193,7 +190,7 @@ function createAccurateCountdown(
     const now = getCurrentTime(); // 当前时间戳
     const timeLeft = Math.max(targetTimestamp - now, 0); // 实时计算剩余时间
 
-    carGame.paihangValue = calculateRank(raceDurationMs.value, timeLeft, suduData);
+    carGame.paihangValue = calculateRank(21579, timeLeft, suduData);
     //当前进度
     carGame.progress = (1 - timeLeft / remainingTime) * 100;
 
@@ -220,15 +217,12 @@ function runCar(
   ranking: NonNullable<StartMatchResp['racingCarRanking']>,
 ) {
   isStartCar.value = true;
-  const remainingSeconds = Math.max(0, remainingTimer);
+  const remainingSeconds = Math.min(remainingTimer, 21579);
 
-  const suduData = ranking.distancesRatio;
-  const frameDuration = raceDurationMs.value / Math.max(suduData[0]?.length || 1, 1);
-  const elapsed = Math.max(0, raceDurationMs.value - remainingSeconds);
-  const currentFrame = Math.min(Math.floor(elapsed / frameDuration), 7);
-  raceGame.value?.setData(remainingSeconds, currentFrame, suduData);
+  const suduData = generateSpeedArray(ranking.rankings);
+  raceGame.value?.setData(remainingSeconds, 7, suduData);
 
-  createAccurateCountdown(endTime, remainingSeconds, ranking.rankings, suduData, () => {
+  createAccurateCountdown(endTime, remainingSeconds, ranking.rankings, () => {
     //倒计时 2 秒
     countdownTimer.value = setTimeout(() => {
       // 清除定时器
@@ -308,6 +302,37 @@ function calculateRank(totalTimer: number, remainingTimer: number, distancesRati
   return ranking;
 }
 
+/** 根据排名生成速度数组 */
+function generateSpeedArray(rank: number[]): number[][] {
+  const baseScores = [
+    [0.2, 0.06, 0.05, 0.02, 0.01, 0.03, 0.24, 0.29],
+    [0.21, 0.13, 0.18, 0.01, 0.24, 0.17, 0.02, 0.04],
+    [0.22, 0.05, 0.2, 0.17, 0.01, 0.01, 0.06, 0.03],
+    [0.21, 0.01, 0.02, 0.25, 0.07, 0.24, 0.14, 0.01],
+    [0.18, 0.04, 0.11, 0.01, 0.22, 0.15, 0.07, 0.11],
+    [0.14, 0.17, 0.14, 0.04, 0.06, 0.12, 0.06, 0.19],
+    [0.13, 0.17, 0, 0.05, 0.11, 0.12, 0.06, 0.09],
+    [0.03, 0.03, 0.15, 0.09, 0.03, 0.01, 0.15, 0.41],
+    [0.23, 0.08, 0.05, 0.01, 0.13, 0.06, 0.07, 0.23],
+    [0.05, 0.12, 0.02, 0.09, 0.22, 0.13, 0.07, 0.27],
+  ];
+
+  const scores = [...baseScores];
+  const totalSpeed = baseScores.map((carScores) => {
+    return carScores.reduce((acc, score) => acc + score, 0);
+  });
+  const carRanked = totalSpeed.map((speed, index) => ({
+    index,
+    speed,
+  }));
+  carRanked.sort((a, b) => b.speed - a.speed);
+  rank.forEach((rankIndex, i) => {
+    const sortedIndex = carRanked[i].index;
+    scores[rankIndex - 1] = baseScores[sortedIndex];
+  });
+  return scores;
+}
+
 document.addEventListener('visibilitychange', function () {
   if (document.visibilityState === 'hidden') {
     soundManager.stopAll();
@@ -336,11 +361,13 @@ document.addEventListener('visibilitychange', function () {
   height: 2533px;
   display: block;
 }
+
 @media only screen and (max-width: 768px) {
   #simulator {
     width: 100%;
   }
 }
+
 @media (min-width: 768px) {
   .pc {
     .game-car {
@@ -351,6 +378,7 @@ document.addEventListener('visibilitychange', function () {
       overflow: hidden;
       margin: auto;
     }
+
     #simulator {
       width: 100%;
       height: 496px;

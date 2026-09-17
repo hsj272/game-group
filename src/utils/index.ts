@@ -1,7 +1,6 @@
 import { lang } from '@/lang';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import utc from 'dayjs/plugin/utc';
 import { Locale } from 'vant';
 // 引入英文语言包
 import enUS from 'vant/es/locale/lang/en-US';
@@ -9,13 +8,12 @@ import zhCN from 'vant/es/locale/lang/zh-CN';
 import VN from 'vant/es/locale/lang/vi-VN';
 import { tip } from '@/components/notice/Notice';
 dayjs.extend(duration);
-dayjs.extend(utc);
 /**
  * 倒计时
  */
 export function countdown(time: string): string {
-  const now = dayjs.utc();
-  const target = dayjs.utc(time);
+  const now = dayjs()
+  const target = dayjs(time);
   const diff = target.diff(now);
 
   if (diff < 0) {
@@ -32,8 +30,8 @@ export function countdown(time: string): string {
 }
 
 export function countdownTwo(time: string): string {
-  const now = dayjs.utc();
-  const target = dayjs.utc(time);
+  const now = dayjs();
+  const target = dayjs(time);
   const diff = target.diff(now);
 
   if (diff < 0) {
@@ -71,7 +69,7 @@ export function convertTime(time: string) {
  * 获取当前时间 时间戳 毫秒
  */
 export function getCurrentTime() {
-  const date = dayjs().subtract(1, 'hour');
+  const date = dayjs();
   return date.valueOf();
 }
 

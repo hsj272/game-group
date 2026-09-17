@@ -84,7 +84,7 @@ import dataCenter from '@/dataCenter';
 import { fetchBetting } from '@/views/api';
 import type { BetReq, BetTypeKey } from '@/views/api/protocol';
 import { getRacingUserId } from '@/api/auth';
-import { reactive, ref, defineProps, computed } from 'vue';
+import { reactive, ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 import router from '@/router';

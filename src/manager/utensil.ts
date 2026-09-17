@@ -1,9 +1,7 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(duration);
-dayjs.extend(utc);
 
 export function useCountdown(
   startTime: string,
@@ -13,11 +11,11 @@ export function useCountdown(
   let interval: ReturnType<typeof setInterval> | null = null;
 
   const startCountdown = () => {
-    const start = dayjs.utc(startTime);
+    const start = dayjs(startTime);
     if (!start.isValid()) {
       throw new Error('Invalid startTime or endTime format.');
     }
-    const now = dayjs.utc();
+    const now = dayjs();
     // 确保倒计时有效
     if (start.isBefore(now)) {
       onComplete();
@@ -25,7 +23,7 @@ export function useCountdown(
     }
 
     interval = setInterval(() => {
-      const now = dayjs.utc();
+      const now = dayjs();
       const timeLeft = start.diff(now);
 
       if (timeLeft <= 0) {

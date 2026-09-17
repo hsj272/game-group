@@ -20,7 +20,7 @@
 import { useCountdown } from '@/manager/utensil';
 import type { GetMatchInfoResp } from '@/views/api/protocol';
 import { onMounted, onUnmounted } from 'vue';
-import { ref, defineProps, defineEmits, type PropType } from 'vue';
+import { ref, type PropType } from 'vue';
 import { lang } from '@/lang';
 const props = defineProps({
   carItem: {
