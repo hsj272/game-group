@@ -8,7 +8,14 @@ class CountDown extends Label {
   }
   update(dt) {
     this.timecount -= dt;
-    if (this.timecount < 0) this.timecount = 0;
+    if (this.timecount <= 0) {
+      this.timecount = 0;
+      this.text = '';
+      this.hidden = true;
+      this.second = 0;
+      return;
+    }
+    this.hidden = false;
     let second = Math.floor(this.timecount / 1000);
     if (second == this.second) return;
     this.second = second;

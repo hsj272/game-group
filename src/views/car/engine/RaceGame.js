@@ -29,6 +29,7 @@ class RaceGame {
     this.cars = [];
     this.sharper = null;
     this.delay = 0;
+    this.userCarNumbers = new Set();
     this.engine.preload(Object.values(Res), this.onLoad.bind(this));
     this.lable = null;
   }
@@ -41,6 +42,23 @@ class RaceGame {
     this.minIndex = minIndex;
     this._leftTime = leftTime;
     this._timer = performance.now();
+  }
+  startLaunch() {
+    if (this.isDestoryed || this.isRunning) return;
+    const launchData = Array.from({ length: 10 }, () =>
+      Array.from({ length: 8 }, () => 0.125),
+    );
+    this.setData(this._totalTime, 7, launchData);
+    this.run(null);
+  }
+  applyRaceData(leftTime, minIndex, list) {
+    if (this.isDestoryed) return;
+    if (this.isRunning) {
+      this.resetData(leftTime, minIndex, list, null);
+      return;
+    }
+    this.setData(leftTime, minIndex, list);
+    this.run(null);
   }
   resetData(leftTime, minIndex, list, callback) {
     if (this.isDestoryed) return;
@@ -55,7 +73,7 @@ class RaceGame {
       let firstRacerTime = (this.minIndex + 1) * sliceTime;
       for (let i = 0; i < 10; i++) {
         const car = this.cars[i];
-        car.setData(this._totalTime, lefttime, sliceTime, firstRacerTime, this._data[i]);
+        car.syncData(this._totalTime, lefttime, sliceTime, firstRacerTime, this._data[i]);
       }
       let realyLefttime = lefttime - (this._totalTime - firstRacerTime);
       let currentPos = 10; // 当前的位置
@@ -132,6 +150,7 @@ class RaceGame {
       b.initPosition(10, carY + gap * i); // 右侧边缘
       b.initDistance(750);
       b.onEnd(this.onCarEnd.bind(this));
+      b.setUserCar(this.userCarNumbers.has(i + 1));
       this.cars.push(b);
     }
 
@@ -226,10 +245,21 @@ class RaceGame {
   }
   resetGame() {
     if (!this.isInited) return;
+    // 切换场次时必须停止上一场的所有更新器，否则下一场 run() 会因
+    // isRunning 仍为 true 而被跳过，车辆只会闪回起点却不会重新起跑。
+    this.isRunning = false;
+    this.seaBg.unregister();
+    this.cityBg.unregister();
+    this.line0.unregister();
+    this.num0.unregister();
+    this.line1.unregister();
     for (let i = 0; i < 10; i++) {
       const car = this.cars[i];
+      car.unregister();
       car.resetPosition();
     }
+    this.sharper.unregister();
+    this.sharper.available = false;
     this.cityBg.resetPosition();
     this.line0.resetPosition();
     this.line1.resetPosition();
@@ -244,6 +274,12 @@ class RaceGame {
   startCount() {
     this.isCount = true;
     if (this.lable) this.lable.register();
+  }
+  setUserCars(carNumbers) {
+    this.userCarNumbers = new Set(carNumbers || []);
+    for (let i = 0; i < this.cars.length; i++) {
+      this.cars[i].setUserCar(this.userCarNumbers.has(i + 1));
+    }
   }
   stopAndClear() {
     this.isDestoryed = true;

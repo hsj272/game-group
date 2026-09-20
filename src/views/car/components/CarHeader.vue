@@ -43,7 +43,7 @@
               </div>
             </div>
           </div>
-          <div v-else class="row-center">
+          <div v-else-if="props.carGame.outTimeValue" class="row-center">
             <p class="car-info-subtitle">{{ props.carGame.outTimeValue }}</p>
             <p class="later">{{ lang.v.sy_ks_start }}</p>
           </div>
@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import Records from '@/views/car/components/Records.vue';
 import { openModal } from '@/manager/view';
@@ -71,7 +71,7 @@ interface CarGame {
   progress: number;
 }
 const route = useRoute();
-const gameId = ref(route.query.gameId);
+const gameId = computed(() => route.query.gameId);
 const props = defineProps({
   carGame: {
     type: Object as () => CarGame,

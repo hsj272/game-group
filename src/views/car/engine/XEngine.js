@@ -452,7 +452,7 @@ class Sharp extends DisplayObject {
     ++this.alphaIndex;
     if (this.alphaIndex >= alphaLength) {
       this.unregister();
-      this.available = true;
+      this.available = false;
       if (this.callback) this.callback();
     } else this.involidate();
   }

@@ -4,8 +4,9 @@
       <TslBtn
         v-if="currentUserId"
         class="bet-btn"
-        @click="showBottom = true"
-        :text="lang.v.sy_ks_bet"
+        :class="{ locked: props.isRunCar }"
+        @click="openBetPanel"
+        :text="props.isRunCar ? '下注已关闭' : lang.v.sy_ks_bet"
       />
       <div class="out-btn col-center col-middle" @click="goBack()">
         <img class="out-btn-img" src="@/assets/events/tuic.png" />
@@ -51,6 +52,25 @@
           </div>
         </div>
       </div>
+      <div class="bet-summary">
+        <div>
+          <span>玩法</span>
+          <strong>{{ currentBetConfig?.betType || '-' }}</strong>
+        </div>
+        <div>
+          <span>赛车</span>
+          <strong>{{ selectedCars.length ? selectedCars.join(', ') : '-' }}</strong>
+        </div>
+        <div>
+          <span>下注金额</span>
+          <strong>{{ moneyData || '-' }}</strong>
+        </div>
+        <div>
+          <span>预计收益</span>
+          <strong class="potential">{{ expectedPayout }}</strong>
+        </div>
+      </div>
+      <p v-if="props.isRunCar" class="bet-locked-tip">比赛已经开始，下注已关闭</p>
       <div class="row-center bom-po">
         <div class="select-pop row-center" v-if="!props.isRunCar">
           <div class="select-pop-item row-center row-middle" @click="isMoney = !isMoney">
@@ -58,7 +78,12 @@
             <p>{{ moneyData }}</p>
           </div>
 
-          <TslBtn class="select-btn" @click="betCar()" :text="lang.v.sy_ks_bet" />
+          <TslBtn
+            class="select-btn"
+            :class="{ disabled: !canSubmitBet }"
+            @click="betCar()"
+            :text="submitting ? '提交中...' : lang.v.sy_ks_bet"
+          />
         </div>
         <div class="out-btn col-center col-middle" @click="showBottom = false">
           <img class="out-btn-img" src="@/assets/events/tuic.png" />
@@ -84,7 +109,7 @@ import dataCenter from '@/dataCenter';
 import { fetchBetting } from '@/views/api';
 import type { BetReq, BetTypeKey } from '@/views/api/protocol';
 import { getRacingUserId } from '@/api/auth';
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 import router from '@/router';
@@ -107,6 +132,10 @@ const chips = Object.freeze([
   cars.car9,
 ]);
 const route = useRoute();
+const emit = defineEmits<{
+  selectionChange: [cars: number[]];
+  betConfirmed: [cars: number[]];
+}>();
 const currentUserId = getRacingUserId();
 const betData = reactive<BetReq>({
   betType: 'Champion',
@@ -126,8 +155,44 @@ const totalAmount = computed(() => {
 // 选择金额
 const isMoney = ref(false);
 const moneyData = ref(dataCenter.bettingConfig.betAmountConfig[0]);
+const currentBetConfig = computed(
+  () => dataCenter.bettingConfig.betRatesConfig[currentIndex.value],
+);
+const expectedPayout = computed(() => {
+  if (!moneyData.value || !currentBetConfig.value) return '0.00';
+  return (Number(moneyData.value) * Number(currentBetConfig.value.betRate)).toFixed(2);
+});
+const requiredCarCount = computed(() =>
+  currentBetConfig.value?.betType === 'Guess Three' ? 3 : 1,
+);
+const canSubmitBet = computed(
+  () =>
+    !props.isRunCar &&
+    !submitting.value &&
+    Boolean(moneyData.value) &&
+    selectedCars.value.length === requiredCarCount.value,
+);
+watch(
+  () => dataCenter.bettingConfig.betAmountConfig,
+  (amounts) => {
+    if (!moneyData.value && amounts.length) moneyData.value = amounts[0];
+  },
+  { deep: true, immediate: true },
+);
+watch(
+  selectedCars,
+  (cars) => emit('selectionChange', [...cars]),
+  { deep: true, immediate: true },
+);
 const goBack = () => {
   router.go(-1);
+};
+const openBetPanel = () => {
+  if (props.isRunCar) {
+    tip.info('比赛已经开始，下注已关闭');
+    return;
+  }
+  showBottom.value = true;
 };
 const onSelect = (money: number) => {
   moneyData.value = money;
@@ -143,12 +208,15 @@ const props = defineProps({
 
 //下注
 async function betCar() {
-  if (submitting.value) return;
+  if (!canSubmitBet.value) {
+    if (props.isRunCar) tip.info('比赛已经开始，下注已关闭');
+    return;
+  }
   const config = dataCenter.bettingConfig.betRatesConfig[currentIndex.value];
   if (!config || !moneyData.value) return;
   const requiredCount = config.betType === 'Guess Three' ? 3 : 1;
   if (selectedCars.value.length !== requiredCount) {
-    tip.error(requiredCount === 3 ? 'Please select 3 cars' : 'Please select 1 car');
+    tip.error(requiredCount === 3 ? '请选择3辆赛车' : '请选择1辆赛车');
     return;
   }
   submitting.value = true;
@@ -158,10 +226,11 @@ async function betCar() {
     betData.racingId = Number(route.query.gameId);
     betData.carNumbers = [...selectedCars.value];
     const resp = await fetchBetting(betData);
+    emit('betConfirmed', [...selectedCars.value]);
     tip.success(`${lang.v.car_tip}: ${dataCenter.conform}${moneyData.value} (#${resp.betId})`);
     showBottom.value = false;
   } catch (error) {
-    tip.error(error instanceof Error ? error.message : 'Bet failed');
+    tip.error(error instanceof Error ? error.message : '下注失败');
   } finally {
     window.setTimeout(() => (submitting.value = false), 500);
   }
@@ -263,6 +332,49 @@ function rightCar(index: number) {
   color: #fff;
   font-size: 40px;
   line-height: 46.88px;
+}
+.bet-btn.locked,
+.select-btn.disabled {
+  opacity: 0.5;
+  filter: grayscale(0.5);
+  cursor: not-allowed;
+}
+
+.bet-summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  span {
+    color: #8f96a3;
+  }
+
+  strong {
+    color: #fff;
+    text-align: right;
+  }
+
+  .potential {
+    color: #fdc057;
+  }
+}
+
+.bet-locked-tip {
+  margin-top: 20px;
+  padding: 18px 24px;
+  border-radius: 14px;
+  color: #ffdf8a;
+  background: rgba(227, 64, 89, 0.16);
+  text-align: center;
 }
 
 .bet-popup {

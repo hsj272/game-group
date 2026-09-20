@@ -1,40 +1,44 @@
 // 语言包
 import { reactive } from 'vue';
 import en from './en';
+import zh from './zh';
+import pt from './pt';
+import sp from './sp';
 import { getLocale } from '@/utils';
-const modules: Record<string, () => Promise<any>> = {
-  en: () => import('./en'),
-  pt: () => import('./pt'),
-  sp: () => import('./sp'),
-  // 添加其他语言模块
+const languagePacks: Record<string, Record<string, string>> = {
+  zh,
+  en,
+  pt,
+  sp,
 };
 
 // 语言包
 function getLanguageCode() {
   const langString = localStorage.getItem('language');
   if (!langString) {
-    return 'en';
+    return 'zh';
   }
   // 曾经记录了错误的对象到localstorage
   if (langString.includes(':')) {
     const name = JSON.parse(langString).lan as string;
     // 修复一下
     localStorage.setItem('language', name);
-    return name;
+    return languagePacks[name] ? name : 'zh';
   }
-  return langString;
+  return languagePacks[langString] ? langString : 'zh';
 }
 class Lang {
-  v: Record<string, string> & typeof en = en; // 设置默认语言
+  v: Record<string, string> & typeof en = {
+    ...en,
+    ...languagePacks[getLanguageCode()],
+  } as Record<string, string> & typeof en;
   m = getLanguageCode();
 
   change(key: string) {
-    this.m = key;
-    localStorage.setItem('language', key);
-    const importModule = modules[key];
-    importModule().then((module) => {
-      this.v = module.default;
-    });
+    const language = languagePacks[key] ? key : 'zh';
+    this.m = language;
+    localStorage.setItem('language', language);
+    this.v = { ...en, ...languagePacks[language] } as Record<string, string> & typeof en;
     getLocale();
   }
 }
