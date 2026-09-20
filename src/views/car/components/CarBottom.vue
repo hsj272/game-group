@@ -392,6 +392,17 @@ function rightCar(index: number) {
   justify-content: space-between;
 }
 
+/* van-popup 会 teleport 到 body，桌面端不能依赖 .pc 的宽度继承。 */
+@media only screen and (min-width: 768px) {
+  :global(.bet-popup) {
+    left: 50% !important;
+    width: 486px !important;
+    max-width: calc(100vw - 16px) !important;
+    box-sizing: border-box;
+    transform: translateX(-50%) !important;
+  }
+}
+
 .bet-po-content {
   display: flex;
   justify-content: space-between;

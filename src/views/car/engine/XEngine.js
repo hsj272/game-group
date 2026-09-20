@@ -596,21 +596,48 @@ class MapEntity extends Sprite {
     this.speed = 0;
     this.dx = 0;
     this.startx = 0;
+    // 地图纹理可以独立缩放，不把缩放传递给车辆等子元素。
+    this.contentScalex = 1;
+    this.contentScaley = 1;
+  }
+  setContentScale(scalex, scaley = scalex) {
+    this.contentScalex = scalex;
+    this.contentScaley = scaley;
+    this.rect.width = this.image.width * scalex;
+    this.rect.height = this.image.height * scaley;
+    if (this.game) this.onAddToStage();
+    this.involidate();
   }
   onAddToStage() {
-    this.startx = this.dx = this.width - this.game.stageWidth;
+    this.startx = this.dx = Math.max(
+      0,
+      this.image.width - this.game.stageWidth / this.contentScalex,
+    );
   }
   draw(ctx, rect) {
     //mapentity直接放舞台
     if (this.rect.isOverlap(rect)) {
       let r = this.rect.cut(rect);
-      let sr = this.rect.clip(this.srcRect, r, 1, 1);
-      let sx = sr.x + this.dx;
-      if (sx >= this.game.stageWidth) {
+      const sourceX = (r.x - this.rect.x) / this.contentScalex;
+      const sourceY = (r.y - this.rect.y) / this.contentScaley;
+      const sourceWidth = r.width / this.contentScalex;
+      const sourceHeight = r.height / this.contentScaley;
+      let sx = sourceX + this.dx;
+      if (sx >= this.image.width) {
         this.dx = 0;
-        sx += this.dx;
+        sx = sourceX;
       }
-      ctx.drawImage(this.image, sx, sr.y, sr.width, sr.height, r.x, r.y, r.width, r.height);
+      ctx.drawImage(
+        this.image,
+        sx,
+        sourceY,
+        sourceWidth,
+        sourceHeight,
+        r.x,
+        r.y,
+        r.width,
+        r.height,
+      );
     }
     super.draw(ctx, rect);
   }

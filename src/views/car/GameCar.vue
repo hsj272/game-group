@@ -1,16 +1,12 @@
 <template>
   <div class="game-car" :class="{ 'final-sprint': isFinalSprint }">
     <canvas id="simulator" width="1242" height="2533" v-if="dataCenter.layout.isMobile"></canvas>
-    <canvas id="simulator" width="1242" height="496" v-if="!dataCenter.layout.isMobile"></canvas>
+    <canvas id="simulator" width="1242" height="1720" v-if="!dataCenter.layout.isMobile"></canvas>
     <CarHeader :car-game="carGame" />
     <div v-if="raceTopThree.length" class="live-ranking">
       <p class="live-ranking-title"><i></i> 实时前三名</p>
-      <div
-        v-for="(carNumber, index) in raceTopThree"
-        :key="carNumber"
-        class="live-ranking-row"
-        :class="{ selected: selectedCars.includes(carNumber) }"
-      >
+      <div v-for="(carNumber, index) in raceTopThree" :key="carNumber" class="live-ranking-row"
+        :class="{ selected: selectedCars.includes(carNumber) }">
         <span class="position">{{ index + 1 }}</span>
         <strong>{{ carNumber }}号车</strong>
         <em v-if="selectedCars.includes(carNumber)">我的车</em>
@@ -23,12 +19,7 @@
       <div v-if="isFinalSprint" class="sprint-notice">最后冲刺</div>
     </Transition>
     <Transition name="countdown-pop">
-      <div
-        v-if="preStartText"
-        :key="preStartText"
-        class="pre-start-overlay"
-        :class="{ go: preStartText === '开始' }"
-      >
+      <div v-if="preStartText" :key="preStartText" class="pre-start-overlay" :class="{ go: preStartText === '开始' }">
         <span>{{ preStartText }}</span>
         <small v-if="/^\d$/.test(preStartText)">准备开始</small>
       </div>
@@ -39,12 +30,8 @@
         <h2>{{ rewardAmount !== null ? '恭喜中奖' : '最终排名' }}</h2>
         <p v-if="rewardAmount !== null" class="reward-amount">+{{ rewardAmount }}</p>
         <div class="result-podium">
-          <div
-            v-for="(carNumber, index) in finalTopThree"
-            :key="carNumber"
-            class="result-podium-item"
-            :class="[`place-${index + 1}`, { selected: selectedCars.includes(carNumber) }]"
-          >
+          <div v-for="(carNumber, index) in finalTopThree" :key="carNumber" class="result-podium-item"
+            :class="[`place-${index + 1}`, { selected: selectedCars.includes(carNumber) }]">
             <span>#{{ index + 1 }}</span>
             <strong>{{ carNumber }}号车</strong>
             <small v-if="selectedCars.includes(carNumber)">我的车</small>
@@ -57,10 +44,7 @@
         <p class="next-race-tip">{{ resultSeconds }}秒后进入下一场</p>
       </section>
     </Transition>
-    <CarBottom
-      :is-run-car="isStartCar || isBettingLocked"
-      @bet-confirmed="markUserCars"
-    />
+    <CarBottom :is-run-car="isStartCar || isBettingLocked" @bet-confirmed="markUserCars" />
   </div>
 </template>
 
@@ -408,11 +392,11 @@ async function startRaceAfterCountdown() {
       resp.remainingMillis === undefined ? timeUntilEnd : resp.remainingMillis,
       0,
     );
-      if (remainingTime <= 0) {
-        isStartingRace = false;
-        raceStartRetryTimer = window.setTimeout(() => void startRaceAfterCountdown(), 100);
-        return;
-      }
+    if (remainingTime <= 0) {
+      isStartingRace = false;
+      raceStartRetryTimer = window.setTimeout(() => void startRaceAfterCountdown(), 100);
+      return;
+    }
 
     runCar(resp.endTime, remainingTime, resp.racingCarRanking);
   } catch (error) {
@@ -669,7 +653,10 @@ document.addEventListener('visibilitychange', function () {
     font-weight: 900;
   }
 
-  strong { font-size: 24px; }
+  strong {
+    font-size: 24px;
+  }
+
   em {
     grid-column: 2;
     font-size: 16px;
@@ -699,15 +686,41 @@ document.addEventListener('visibilitychange', function () {
   box-shadow: 0 8px 30px rgba(227, 64, 89, 0.4);
 }
 
-.race-notice { top: 32%; }
-.sprint-notice { top: 45%; color: #fff093; }
-.race-notice-enter-active,
-.race-notice-leave-active { transition: all 0.25s ease; }
-.race-notice-enter-from { opacity: 0; transform: translate(-50%, 30px) scale(0.9); }
-.race-notice-leave-to { opacity: 0; transform: translate(-50%, -20px); }
+.race-notice {
+  top: 32%;
+}
 
-@keyframes livePulse { to { opacity: 0.35; } }
-@keyframes sprintGlow { to { box-shadow: inset 0 0 150px rgba(227, 64, 89, 0.9); } }
+.sprint-notice {
+  top: 45%;
+  color: #fff093;
+}
+
+.race-notice-enter-active,
+.race-notice-leave-active {
+  transition: all 0.25s ease;
+}
+
+.race-notice-enter-from {
+  opacity: 0;
+  transform: translate(-50%, 30px) scale(0.9);
+}
+
+.race-notice-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -20px);
+}
+
+@keyframes livePulse {
+  to {
+    opacity: 0.35;
+  }
+}
+
+@keyframes sprintGlow {
+  to {
+    box-shadow: inset 0 0 150px rgba(227, 64, 89, 0.9);
+  }
+}
 
 .race-result {
   position: absolute;
@@ -771,9 +784,22 @@ document.addEventListener('visibilitychange', function () {
   background: rgba(255, 255, 255, 0.06);
   animation: podiumRise 0.45s both;
 
-  span { color: #fff093; font-size: 26px; font-weight: 900; }
-  strong { margin-top: 8px; font-size: 29px; }
-  small { margin-top: 8px; color: #fdc057; font-weight: 900; }
+  span {
+    color: #fff093;
+    font-size: 26px;
+    font-weight: 900;
+  }
+
+  strong {
+    margin-top: 8px;
+    font-size: 29px;
+  }
+
+  small {
+    margin-top: 8px;
+    color: #fdc057;
+    font-weight: 900;
+  }
 
   &.place-1 {
     min-height: 190px;
@@ -781,7 +807,9 @@ document.addEventListener('visibilitychange', function () {
     background: linear-gradient(180deg, rgba(255, 240, 147, 0.18), rgba(255, 255, 255, 0.04));
   }
 
-  &.selected { box-shadow: inset 0 0 0 3px #fdc057; }
+  &.selected {
+    box-shadow: inset 0 0 0 3px #fdc057;
+  }
 }
 
 .result-message {
@@ -811,15 +839,33 @@ document.addEventListener('visibilitychange', function () {
 }
 
 .result-pop-enter-active,
-.result-pop-leave-active { transition: all 0.28s ease; }
+.result-pop-leave-active {
+  transition: all 0.28s ease;
+}
+
 .result-pop-enter-from,
-.result-pop-leave-to { opacity: 0; transform: translate(-50%, -44%) scale(0.92); }
+.result-pop-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -44%) scale(0.92);
+}
 
 @keyframes podiumRise {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-@keyframes rewardPulse { to { transform: scale(1.07); } }
+
+@keyframes rewardPulse {
+  to {
+    transform: scale(1.07);
+  }
+}
 
 .pre-start-overlay {
   position: absolute;
@@ -860,14 +906,22 @@ document.addEventListener('visibilitychange', function () {
 .countdown-pop-leave-active {
   transition: opacity 0.18s ease;
 }
+
 .countdown-pop-enter-from,
 .countdown-pop-leave-to {
   opacity: 0;
 }
 
 @keyframes countdownPulse {
-  from { transform: scale(1.5); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 #simulator {
@@ -895,7 +949,7 @@ document.addEventListener('visibilitychange', function () {
 
     #simulator {
       width: 100%;
-      height: 496px;
+      height: 1720px;
       max-width: 1000px;
       display: block;
     }

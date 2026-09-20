@@ -10,9 +10,10 @@ body {
   height: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   background-color: #13181f;
-  overflow: hidden; /* 防止横向滚动 */
+  overflow-x: hidden;
+  overflow-y: auto;
   font-family: Arial, sans-serif;
   font-feature-settings:
     'tnum' on,
@@ -25,16 +26,29 @@ body {
 }
 
 #app {
-  width: 100%;
+  width: 486px;
   height: 100%;
-  max-width: 1242px; /* 强制最大宽度为手机尺寸 */
+  max-width: 486px;
   background-color: #13181f;
-  overflow: hidden;
+  overflow-x: hidden;
   overflow-y: auto;
   font-family: Arial, sans-serif;
   font-feature-settings:
     'tnum' on,
     'lnum' on;
+}
+
+#app > .app-shell {
+  min-height: 100%;
+}
+
+/* 桌面端使用与赛车画布一致的内容宽度，并始终保持居中。 */
+@media only screen and (min-width: 768px) {
+  #app {
+    width: 486px;
+    max-width: 486px;
+    margin: 0 auto;
+  }
 }
 
 ::-webkit-scrollbar {

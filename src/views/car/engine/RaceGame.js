@@ -104,35 +104,53 @@ class RaceGame {
     );
     this.engine.addChild(this.cityBg);
 
-    this.seaBg = new MapEntity(
-      this.engine.getImage(dataCenter.layout.isMobile ? Res.street : Res.street_pc),
-    );
+    // PC 画布现在使用 1720px 高度，必须使用完整高度的赛道纹理。
+    // street_pc 只有 396px 高，继续使用它会让车辆被排开后下方出现大片空白。
+    this.seaBg = new MapEntity(this.engine.getImage(Res.street));
     this.engine.addChild(this.seaBg);
     this.seaBg.y = dataCenter.layout.isMobile ? 510 : 100;
+    // 只缩放赛道纹理，不缩放车辆及其轮胎、喷气等子元素。
+    if (!dataCenter.layout.isMobile) {
+      this.seaBg.setContentScale(0.8);
+    }
     this.seaBg.speed = 25;
 
     this.cityBg.speed = 0.6;
 
+    // PC 的 line_pc 仅 400px 高，只能看到上方红白线；使用完整线表素材
+    // 并缩放到 PC 画布比例，确保 1 到 10 号线贯穿整个赛道。
     this.line0 = new RunEntity(
-      this.engine.getImage(dataCenter.layout.isMobile ? Res.line : Res.line_pc),
+      this.engine.getImage(dataCenter.layout.isMobile ? Res.line : Res.line),
     );
+    if (!dataCenter.layout.isMobile) {
+      this.line0.scalex = 0.65;
+      this.line0.scaley = 0.85;
+    }
     this.seaBg.addChild(this.line0);
 
-    const lineY = dataCenter.layout.isMobile ? 140 : 30;
+    const lineY = dataCenter.layout.isMobile ? 140 : 0;
 
     this.line0.initPosition(0, lineY);
 
     this.num0 = new RunEntity(
-      this.engine.getImage(dataCenter.layout.isMobile ? Res.numat : Res.numat_pc),
+      this.engine.getImage(dataCenter.layout.isMobile ? Res.numat : Res.numat),
     );
+    if (!dataCenter.layout.isMobile) {
+      this.num0.scalex = 0.65;
+      this.num0.scaley = 0.85;
+    }
     this.seaBg.addChild(this.num0);
-    const numX = dataCenter.layout.isMobile ? 240 : 40;
-    const numY = dataCenter.layout.isMobile ? 140 : 20;
+    const numX = dataCenter.layout.isMobile ? 240 : 190;
+    const numY = dataCenter.layout.isMobile ? 140 : 0;
     this.num0.initPosition(numX, numY);
 
     this.line1 = new RunEntity(
-      this.engine.getImage(dataCenter.layout.isMobile ? Res.line : Res.line_pc),
+      this.engine.getImage(dataCenter.layout.isMobile ? Res.line : Res.line),
     );
+    if (!dataCenter.layout.isMobile) {
+      this.line1.scalex = 0.65;
+      this.line1.scaley = 0.85;
+    }
     this.seaBg.addChild(this.line1);
 
     const gap = (this.engine.stageHeight - this.seaBg.y) / 11; //计算每个车的间距

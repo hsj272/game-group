@@ -67,22 +67,27 @@ const startCar = (racingId: number) => {
   line-height: 42px;
   margin-top: 55px;
 }
+
 .car-info {
   flex: 1;
 }
+
 .car-img {
   width: 111.62px;
   height: 111.62px;
 }
+
 .distance-info {
   flex: 2;
   gap: 12px;
 }
+
 .clock-img {
   width: 42px;
   height: 42px;
   margin-right: 17px;
 }
+
 .distance-time {
   font-weight: 500;
   font-size: 48px;
@@ -90,6 +95,7 @@ const startCar = (racingId: number) => {
   line-height: 56px;
   color: #fdc057;
 }
+
 .bet-btn {
   width: 259.82px;
   height: 121.59px;
@@ -102,6 +108,7 @@ const startCar = (racingId: number) => {
   border-radius: 20px;
   border: 3px solid rgba(225, 61, 87, 1);
 }
+
 @media (min-width: 768px) {
   .pc {
     .distance-car {
@@ -111,7 +118,7 @@ const startCar = (racingId: number) => {
       color: #ffffff;
       overflow: hidden;
       font-weight: 500;
-      font-size: 16px;
+      font-size: 26px;
       line-height: 22px;
       margin-top: 25px;
     }
@@ -120,29 +127,33 @@ const startCar = (racingId: number) => {
       width: 82px;
       height: 82px;
     }
+
     .distance-info {
       flex: 2;
       gap: 10px;
     }
+
     .clock-img {
-      width: 22px;
-      height: 22px;
+      width: 32px;
+      height: 32px;
       margin-right: 8px;
     }
+
     .distance-time {
       font-weight: 500;
-      font-size: 18px;
+      font-size: 26px;
       color: #fdc057;
       line-height: 26px;
       color: #fdc057;
     }
+
     .bet-btn {
       width: 185.67px;
       height: 40px;
       border-radius: 10px;
       background: rgba(255, 255, 255, 0.05);
 
-      font-size: 20px;
+      font-size: 24px;
       line-height: 26.88px;
       color: rgba(225, 61, 87, 1);
 
