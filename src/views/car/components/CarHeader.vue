@@ -267,16 +267,16 @@ const getColorStyle = (charObj: { char: string; isRank: boolean }) => {
       line-height: 27px;
     }
     .record-img {
-      width: 15.71px;
-      height: 13.1px;
-      margin-right: 10px;
+      width: 28px;
+      height: 24px;
+      margin-right: 12px;
       cursor: pointer;
     }
     .record-row {
       font-weight: bold;
-      font-size: 20px;
+      font-size: 26px;
       color: #ffffff;
-      line-height: 27px;
+      line-height: 32px;
     }
     .car-info {
       border-radius: 10px;

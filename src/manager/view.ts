@@ -19,7 +19,9 @@ export function openModal<T extends Record<string, any>>(
   document.body.appendChild(div); // 追加到body
 
   //补充蒙版样式，居中效果
-  div.className = 'top-layer center';
+  // Modals are mounted directly under body, outside of the `.pc` app shell.
+  // Keep the desktop/mobile modal styles scoped consistently with the app.
+  div.className = 'top-layer center pc';
   div.style.zIndex = `${zIndex}`;
   const container = document.createElement('div');
   container.className = 'container fade-in';

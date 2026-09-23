@@ -596,48 +596,21 @@ class MapEntity extends Sprite {
     this.speed = 0;
     this.dx = 0;
     this.startx = 0;
-    // 地图纹理可以独立缩放，不把缩放传递给车辆等子元素。
-    this.contentScalex = 1;
-    this.contentScaley = 1;
-  }
-  setContentScale(scalex, scaley = scalex) {
-    this.contentScalex = scalex;
-    this.contentScaley = scaley;
-    this.rect.width = this.image.width * scalex;
-    this.rect.height = this.image.height * scaley;
-    if (this.game) this.onAddToStage();
-    this.involidate();
   }
   onAddToStage() {
-    this.startx = this.dx = Math.max(
-      0,
-      this.image.width - this.game.stageWidth / this.contentScalex,
-    );
+    this.startx = this.dx = this.width - this.game.stageWidth;
   }
   draw(ctx, rect) {
     //mapentity直接放舞台
     if (this.rect.isOverlap(rect)) {
       let r = this.rect.cut(rect);
-      const sourceX = (r.x - this.rect.x) / this.contentScalex;
-      const sourceY = (r.y - this.rect.y) / this.contentScaley;
-      const sourceWidth = r.width / this.contentScalex;
-      const sourceHeight = r.height / this.contentScaley;
-      let sx = sourceX + this.dx;
-      if (sx >= this.image.width) {
+      let sr = this.rect.clip(this.srcRect, r, 1, 1);
+      let sx = sr.x + this.dx;
+      if (sx >= this.game.stageWidth) {
         this.dx = 0;
-        sx = sourceX;
+        sx += this.dx;
       }
-      ctx.drawImage(
-        this.image,
-        sx,
-        sourceY,
-        sourceWidth,
-        sourceHeight,
-        r.x,
-        r.y,
-        r.width,
-        r.height,
-      );
+      ctx.drawImage(this.image, sx, sr.y, sr.width, sr.height, r.x, r.y, r.width, r.height);
     }
     super.draw(ctx, rect);
   }
@@ -647,6 +620,47 @@ class MapEntity extends Sprite {
   }
   resetPosition() {
     this.dx = this.startx;
+    this.involidate();
+  }
+}
+
+// PC 赛道独立使用缩放后的单向循环，不改变 MapEntity，也不缩放赛车子元素。
+class PcRaceTrackEntity extends MapEntity {
+  constructor(param, scale = 0.8) {
+    super(param);
+    this.trackScale = scale;
+    this.rect.width = this.image.width * scale;
+    this.rect.height = this.image.height * scale;
+    this.loopWidth = 0;
+  }
+  onAddToStage() {
+    this.loopWidth = this.game.stageWidth / this.trackScale;
+    this.startx = this.dx = 0;
+  }
+  draw(ctx, rect) {
+    if (this.rect.isOverlap(rect)) {
+      const r = this.rect.cut(rect);
+      const sourceX = (r.x - this.rect.x) / this.trackScale + this.dx;
+      const sourceY = (r.y - this.rect.y) / this.trackScale;
+      const sourceWidth = r.width / this.trackScale;
+      const sourceHeight = r.height / this.trackScale;
+      ctx.drawImage(
+        this.image,
+        sourceX,
+        sourceY,
+        sourceWidth,
+        sourceHeight,
+        r.x,
+        r.y,
+        r.width,
+        r.height,
+      );
+    }
+    DisplayObject.prototype.draw.call(this, ctx, rect);
+  }
+  update(dt) {
+    this.dx += (this.speed * dt) / 10;
+    if (this.dx >= this.loopWidth) this.dx %= this.loopWidth;
     this.involidate();
   }
 }
@@ -665,4 +679,4 @@ class Entity extends Sprite {
     super.draw(ctx, rect);
   }
 }
-export { XEngine, Rect, Sharp, Sprite, MapEntity, Entity, Label };
+export { XEngine, Rect, Sharp, Sprite, MapEntity, PcRaceTrackEntity, Entity, Label };

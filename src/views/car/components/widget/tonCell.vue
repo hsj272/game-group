@@ -95,28 +95,30 @@ const props = defineProps({
     .car-cell {
       background: #1b212b;
       border-radius: 10px;
-      margin: 10px 0;
-      padding: 15px 5px;
+      margin: 5px 0;
+      padding: 4px 5px;
       border: 2px solid #a3a8b3;
       border-radius: 10px;
-      height: 100px;
+      height: 54px;
+      box-sizing: border-box;
     }
     .records-right {
-      height: 118px;
+      height: 44px;
       width: 100%;
     }
 
     .records-right-title {
-      width: 139px;
-      height: 109px;
-      padding: 9px;
+      width: 105px;
+      height: 42px;
+      padding: 3px;
       background: #161b24;
-      border-radius: 20px;
+      border-radius: 8px;
       object-fit: contain;
 
       img {
-        width: 126.57px;
-        height: 56px;
+        width: 100px;
+        height: 38px;
+        object-fit: contain;
       }
     }
     .ranking-icons {

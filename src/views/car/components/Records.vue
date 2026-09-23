@@ -14,6 +14,9 @@
     <div class="sanjiao" :class="{ twosan: selectBtnId === 2 }"></div>
     <div class="records-content">
       <div v-if="selectBtnId === 1">
+        <p class="records-description">
+          每行显示一辆车最近的名次记录；X 表示该场未进入前三名。
+        </p>
         <div class="records-num-row">
           <div
             class="records-num records-title center"
@@ -216,7 +219,7 @@ const getRecordsData = () => {
 
   fetchHistoryRacing(selectedRecordNum.value, 1).then((resp) => {
     if (!resp) return;
-    recordsDatas.value = resp.data;
+    recordsDatas.value = resp.record;
   });
 };
 watch(selectedRecordNum, (newList) => {
@@ -293,6 +296,14 @@ watch(selectBtnId, (newId) => {
   margin-top: -30px;
   border-radius: 43px;
   padding: 55px 30px;
+}
+
+.records-description {
+  margin: 0 0 12px;
+  color: #a3a8b3;
+  font-size: 28px;
+  line-height: 1.35;
+  text-align: center;
 }
 
 .records-num-row {
@@ -380,24 +391,24 @@ watch(selectBtnId, (newId) => {
   .pc {
     .records {
       width: 467px;
-      height: 413px;
-      padding: 25px 20px 39px 20px;
+      height: 540px;
+      padding: 22px 20px 28px;
       border-radius: 10px;
       border: 3px solid #ffffff;
       background: #1b212b;
       overflow: hidden;
     }
     .records-item {
-      width: 185.88px;
-      height: 61px;
+      width: 158px;
+      height: 48px;
       background: #0e131b;
       border: 1px solid #ffffff;
       border-radius: 10px;
       font-weight: 900;
-      font-size: 18px;
+      font-size: 16px;
       color: #c8c6c6;
       line-height: 26px;
-      margin-right: 23px;
+      margin: 0 6px;
     }
     .actives {
       border: none;
@@ -405,37 +416,43 @@ watch(selectBtnId, (newId) => {
     }
 
     .sanjiao {
-      width: 100px;
-      height: 100px;
+      width: 40px;
+      height: 32px;
       background: #0e131b;
       clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-      margin-top: 35px;
-      margin-left: 100px;
+      margin-top: 12px;
+      margin-left: 106px;
     }
     .twosan {
-      transform: translateX(500px);
+      transform: translateX(166px);
     }
 
     .records-content {
       width: 100%;
       height: 100%;
       background: #0e131b;
-      margin-top: -10px;
+      margin-top: -8px;
       border-radius: 10px;
-      padding: 25px 15px;
+      padding: 18px 15px;
       box-sizing: border-box;
+    }
+
+    .records-description {
+      margin: 0 0 8px;
+      font-size: 13px;
+      line-height: 18px;
     }
 
     .records-num-row {
       display: flex;
       flex-direction: row;
       justify-content: space-around;
-      margin-top: 10px;
+      margin-top: 12px;
       .records-title {
         border: 2px solid #a3a8b3;
         border-radius: 7px;
         font-weight: bold;
-        font-size: 12px;
+      font-size: 13px;
         color: #a3a8b3;
         line-height: 16px;
       }
@@ -446,15 +463,15 @@ watch(selectBtnId, (newId) => {
       .records-oved {
         padding: 2px 10px;
         font-weight: bold;
-        font-size: 15px;
+      font-size: 16px;
         color: #a3a8b3;
         line-height: 20px;
       }
     }
 
     .records-car {
-      margin-top: 10px;
-      height: 120px;
+      margin-top: 16px;
+      height: 300px;
       overflow: hidden;
       overflow-y: auto;
     }
@@ -501,8 +518,8 @@ watch(selectBtnId, (newId) => {
     }
 
     .right-content {
-      margin-top: 12px;
-      height: 240px;
+      margin-top: 8px;
+      height: 292px;
       overflow: hidden;
       overflow-y: auto;
     }

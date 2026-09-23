@@ -18,7 +18,7 @@ class Car extends Entity {
     this.timer = 0;
     this.syncOffsetX = 0;
     this.syncTimeLeft = 0;
-    this.syncDuration = 1200;
+    this.syncDuration =  1200;
     this.isUserCar = false;
 
     this.wheel1 = new Entity(dataCenter.layout.isMobile ? Res.wheel : Res.wheel_pc);

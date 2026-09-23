@@ -157,6 +157,21 @@ body {
   }
 }
 
+@media (min-width: 768px) {
+  // Modals are mounted on body and carry the pc class themselves.
+  .pc.top-layer {
+    .container {
+      padding-bottom: 32px;
+    }
+
+    .close {
+      width: 220px;
+      font-size: 14px !important;
+      line-height: 20px !important;
+    }
+  }
+}
+
 /* 蒙版淡入动画 */
 .fade-in {
   animation: fadeInSlideUp 0.5s ease forwards; /* 进入动画：从底部到中间 */

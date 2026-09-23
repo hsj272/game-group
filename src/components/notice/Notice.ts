@@ -13,6 +13,7 @@ export const openNotification = (status: string, text: string) => {
   notification.config({
     duration: 3,
     maxCount: 1,
+    getContainer: () => document.querySelector('.pc .game-car') || document.body,
   });
   // 定义关闭函数
   const closeNotification = () => {

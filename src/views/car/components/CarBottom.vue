@@ -1,13 +1,8 @@
 <template>
   <div>
     <div class="car-bottom row-center">
-      <TslBtn
-        v-if="currentUserId"
-        class="bet-btn"
-        :class="{ locked: props.isRunCar }"
-        @click="openBetPanel"
-        :text="props.isRunCar ? '下注已关闭' : lang.v.sy_ks_bet"
-      />
+      <TslBtn v-if="currentUserId" class="bet-btn" :class="{ locked: props.isRunCar }" @click="openBetPanel"
+        :text="props.isRunCar ? '下注已关闭' : lang.v.sy_ks_bet" />
       <div class="out-btn col-center col-middle" @click="goBack()">
         <img class="out-btn-img" src="@/assets/events/tuic.png" />
       </div>
@@ -24,30 +19,18 @@
 
       <div class="bet-po-record">
         <div class="bet-po-record-item col-center">
-          <div
-            v-for="(item, index) in dataCenter.bettingConfig.betRatesConfig"
-            :key="index"
-            class="bet-po-record-item-item col-center col-middle"
-            :class="{ active: index === currentIndex }"
-            @click="selctCar(index)"
-          >
+          <div v-for="(item, index) in dataCenter.bettingConfig.betRatesConfig" :key="index"
+            class="bet-po-record-item-item col-center col-middle" :class="{ active: index === currentIndex }"
+            @click="selctCar(index)">
             <p class="bet-po-record-item-item-num">X{{ item.betRate }}</p>
             <p class="bet-po-record-item-item-name">{{ item.betType }}</p>
           </div>
         </div>
         <div class="bet-po-record-item-right">
-          <div
-            v-for="(item, index) in 10"
-            :key="item"
-            class="bet-po-record-item-right-item col-center col-middle"
-            @click="rightCar(item)"
-          >
+          <div v-for="(item, index) in 10" :key="item" class="bet-po-record-item-right-item col-center col-middle"
+            @click="rightCar(item)">
             <img :src="selectedCars.includes(item) ? duil : kont" class="kont-icon" />
-            <img
-              :src="chips[index]"
-              class="car-icon"
-              :class="{ rightCarItem: selectedCars.includes(item) }"
-            />
+            <img :src="chips[index]" class="car-icon" :class="{ rightCarItem: selectedCars.includes(item) }" />
             <p :class="{ txtactive: selectedCars.includes(item) }">{{ item }}</p>
           </div>
         </div>
@@ -78,24 +61,16 @@
             <p>{{ moneyData }}</p>
           </div>
 
-          <TslBtn
-            class="select-btn"
-            :class="{ disabled: !canSubmitBet }"
-            @click="betCar()"
-            :text="submitting ? '提交中...' : lang.v.sy_ks_bet"
-          />
+          <TslBtn class="select-btn" :class="{ disabled: !canSubmitBet }" @click="betCar()"
+            :text="submitting ? '提交中...' : lang.v.sy_ks_bet" />
         </div>
-        <div class="out-btn col-center col-middle" @click="showBottom = false">
+        <!-- <div class="out-btn col-center col-middle" @click="showBottom = false">
           <img class="out-btn-img" src="@/assets/events/tuic.png" />
-        </div>
+        </div> -->
       </div>
       <div v-if="isMoney" class="amount-selection">
         <div class="amount-options">
-          <p
-            v-for="item in dataCenter.bettingConfig.betAmountConfig"
-            :key="item"
-            @click="onSelect(item)"
-          >
+          <p v-for="item in dataCenter.bettingConfig.betAmountConfig" :key="item" @click="onSelect(item)">
             {{ item }}
           </p>
         </div>
@@ -333,6 +308,7 @@ function rightCar(index: number) {
   font-size: 40px;
   line-height: 46.88px;
 }
+
 .bet-btn.locked,
 .select-btn.disabled {
   opacity: 0.5;
@@ -396,8 +372,8 @@ function rightCar(index: number) {
 @media only screen and (min-width: 768px) {
   :global(.bet-popup) {
     left: 50% !important;
-    width: 486px !important;
-    max-width: calc(100vw - 16px) !important;
+    width: min(1000px, 100vw) !important;
+    max-width: 1000px !important;
     box-sizing: border-box;
     transform: translateX(-50%) !important;
   }
@@ -410,6 +386,7 @@ function rightCar(index: number) {
   font-size: 48px;
   color: #ffffff;
   line-height: 56px;
+
   .bet-num {
     font-weight: 900;
     font-size: 48px;
@@ -440,6 +417,7 @@ function rightCar(index: number) {
       flex-direction: column;
       justify-content: center;
       align-items: center;
+
       .bet-po-record-item-item-num {
         font-weight: 600;
         font-size: 40px;
@@ -447,6 +425,7 @@ function rightCar(index: number) {
         line-height: 47px;
         margin-bottom: 27px;
       }
+
       .bet-po-record-item-item-name {
         font-weight: 600;
         font-size: 30px;
@@ -454,6 +433,7 @@ function rightCar(index: number) {
         line-height: 46px;
       }
     }
+
     .active {
       background: #0e131b;
       border: 1px solid #000000;
@@ -467,6 +447,7 @@ function rightCar(index: number) {
     gap: 24px;
     height: 560px;
     grid-template-columns: repeat(3, 1fr);
+
     .car-icon {
       width: 100%;
       object-fit: contain;
@@ -477,9 +458,11 @@ function rightCar(index: number) {
       padding: 0 10px;
       margin-bottom: 19px;
     }
+
     .rightCarItem {
       border: 2px solid #fabc46;
     }
+
     .bet-po-record-item-right-item {
       align-items: center;
       font-weight: 900;
@@ -488,9 +471,11 @@ function rightCar(index: number) {
       line-height: 38px;
       position: relative;
     }
+
     .txtactive {
       color: #f7b835;
     }
+
     .kont-icon {
       width: 40px;
       height: 40px;
@@ -506,10 +491,11 @@ function rightCar(index: number) {
   justify-content: space-between;
   margin-top: auto;
   gap: 40px;
+  margin-top: 20px;
 
   .select-pop {
     flex: 2;
-    background-color: #2d2d2d;
+    // background-color: #2d2d2d;
     border-radius: 23px;
 
     .select-pop-item {
@@ -519,6 +505,7 @@ function rightCar(index: number) {
       line-height: 56px;
       display: flex;
       align-items: center;
+
       .money-icon {
         width: 69px;
         height: 69px;
@@ -539,6 +526,7 @@ function rightCar(index: number) {
     }
   }
 }
+
 .out-btn {
   width: 222px;
   height: 134px;
@@ -579,6 +567,7 @@ function rightCar(index: number) {
     cursor: pointer;
   }
 }
+
 @media (min-width: 768px) {
   .pc {
     .car-bottom {
@@ -622,7 +611,7 @@ function rightCar(index: number) {
     }
 
     .bet-popup {
-      height: 555.32px;
+      height: 1220px;
       background: #1b212b;
       border-top-left-radius: 16px;
       border-top-right-radius: 16px;
@@ -643,6 +632,7 @@ function rightCar(index: number) {
       font-size: 18px;
       color: #ffffff;
       line-height: 27px;
+
       .bet-num {
         font-weight: 900;
         font-size: 18px;
@@ -673,6 +663,7 @@ function rightCar(index: number) {
           flex-direction: column;
           justify-content: center;
           align-items: center;
+
           .bet-po-record-item-item-num {
             font-weight: 600;
             font-size: 20px;
@@ -680,6 +671,7 @@ function rightCar(index: number) {
             line-height: 27px;
             margin-bottom: 17px;
           }
+
           .bet-po-record-item-item-name {
             font-weight: 600;
             font-size: 20px;
@@ -687,6 +679,7 @@ function rightCar(index: number) {
             line-height: 26px;
           }
         }
+
         .active {
           background: #0e131b;
           border: 1px solid #000000;
@@ -700,6 +693,7 @@ function rightCar(index: number) {
         gap: 34px;
         height: 560px;
         grid-template-columns: repeat(4, 1fr);
+
         .car-icon {
           width: 100%;
           object-fit: contain;
@@ -710,9 +704,11 @@ function rightCar(index: number) {
           padding: 0 10px;
           margin-bottom: 10px;
         }
+
         .rightCarItem {
           border: 2px solid #fabc46;
         }
+
         .bet-po-record-item-right-item {
           align-items: center;
           font-weight: 900;
@@ -721,9 +717,11 @@ function rightCar(index: number) {
           line-height: 28px;
           position: relative;
         }
+
         .txtactive {
           color: #f7b835;
         }
+
         .kont-icon {
           width: 30px;
           height: 30px;
@@ -739,10 +737,11 @@ function rightCar(index: number) {
       justify-content: space-between;
       margin-top: auto;
       gap: 20px;
+      margin-top: 20px;
 
       .select-pop {
         flex: 2;
-        background-color: #2d2d2d;
+        // background-color: #2d2d2d;
         border-radius: 10px;
 
         .select-pop-item {
@@ -752,6 +751,7 @@ function rightCar(index: number) {
           line-height: 26px;
           display: flex;
           align-items: center;
+
           .money-icon {
             width: 39px;
             height: 39px;
@@ -772,9 +772,10 @@ function rightCar(index: number) {
         }
       }
     }
+
     .out-btn {
       width: 122px;
-      height: 90px;
+      height: 60px;
       background-color: #2d2d2d;
       border-radius: 10px;
       display: flex;

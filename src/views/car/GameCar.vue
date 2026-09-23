@@ -75,6 +75,7 @@ const preStartText = ref('');
 const isBettingLocked = ref(false);
 let preStartHideTimer = 0;
 let raceNoticeTimer = 0;
+let resultRevealTimer = 0;
 let pollTimer = 0;
 let racingSocket: RacingSocket | undefined;
 let isChangingRace = false;
@@ -174,6 +175,7 @@ onUnmounted(() => {
   clearInterval(pollTimer);
   clearTimeout(preStartHideTimer);
   clearTimeout(raceNoticeTimer);
+  clearTimeout(resultRevealTimer);
   clearTimeout(raceStartRetryTimer);
   racingSocket?.close();
   if (animationFrameId) {
@@ -351,7 +353,7 @@ async function restoreUserCars(racingId: number) {
   try {
     const bets = await fetchMyBets({ pageNum: 1, pageSize: 50 });
     if (racingId !== Number(route.query.gameId)) return;
-    const carNumbers = bets.data
+    const carNumbers = bets.record
       .filter((bet) => bet.racingId === racingId)
       .flatMap((bet) => bet.carNumbers);
     if (carNumbers.length) markUserCars(carNumbers);
@@ -439,6 +441,7 @@ function goToNextRace() {
   countdownData.timer = 0;
   clearTimeout(preStartHideTimer);
   clearTimeout(raceNoticeTimer);
+  clearTimeout(resultRevealTimer);
   clearTimeout(raceStartRetryTimer);
   if (animationFrameId !== null) {
     cancelAnimationFrame(animationFrameId);
@@ -474,21 +477,26 @@ function goToNextRace() {
 
 function showRaceResult(ranking?: number[]) {
   if (ranking?.length) carGame.paihangValue = [...ranking];
-  if (isResultVisible.value) return;
+  if (isResultVisible.value || resultRevealTimer) return;
 
-  isResultVisible.value = true;
-  isStartCar.value = false;
-  isFinalSprint.value = false;
-  carGame.progress = 100;
-  resultSeconds.value = 3;
-  clearInterval(countdownTimer.value);
-  countdownTimer.value = window.setInterval(() => {
-    resultSeconds.value -= 1;
-    if (resultSeconds.value <= 0) {
-      clearInterval(countdownTimer.value);
-      goToNextRace();
-    }
-  }, 1000);
+  // RaceGame 会先执行冲线闪光，再显示结果面板，避免面板提前盖住冲线效果。
+  resultRevealTimer = window.setTimeout(() => {
+    resultRevealTimer = 0;
+    if (isResultVisible.value) return;
+    isResultVisible.value = true;
+    isStartCar.value = false;
+    isFinalSprint.value = false;
+    carGame.progress = 100;
+    resultSeconds.value = 3;
+    clearInterval(countdownTimer.value);
+    countdownTimer.value = window.setInterval(() => {
+      resultSeconds.value -= 1;
+      if (resultSeconds.value <= 0) {
+        clearInterval(countdownTimer.value);
+        goToNextRace();
+      }
+    }, 1000);
+  }, 800);
 }
 
 function playVictorySound() {
@@ -938,6 +946,132 @@ document.addEventListener('visibilitychange', function () {
 
 @media (min-width: 768px) {
   .pc {
+    .race-notice {
+      padding: 10px 22px;
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+
+    .sprint-notice {
+      padding: 10px 22px;
+      font-size: 22px;
+      letter-spacing: 1px;
+    }
+
+    .pre-start-overlay span {
+      font-size: 150px;
+    }
+
+    .pre-start-overlay small {
+      margin-top: 16px;
+      font-size: 24px;
+      letter-spacing: 8px;
+    }
+
+    .pre-start-overlay.go span {
+      font-size: 110px;
+    }
+
+    .live-ranking {
+      top: 120px;
+      right: 16px;
+      width: 220px;
+      padding: 12px;
+      border-radius: 14px;
+    }
+
+    .live-ranking-title {
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .live-ranking-title i {
+      width: 8px;
+      height: 8px;
+    }
+
+    .live-ranking-row {
+      grid-template-columns: 30px 1fr;
+      min-height: 36px;
+      padding: 4px 8px;
+    }
+
+    .live-ranking-row strong {
+      font-size: 18px;
+    }
+
+    .live-ranking-row em {
+      font-size: 12px;
+    }
+
+    .race-result {
+      width: min(60%, 520px);
+      padding: 26px 24px 22px;
+      border-width: 2px;
+      border-radius: 22px;
+    }
+
+    .race-result h2 {
+      margin: 5px 0 12px;
+      font-size: 42px;
+    }
+
+    .result-eyebrow {
+      font-size: 16px;
+      letter-spacing: 4px;
+    }
+
+    .reward-amount {
+      margin-bottom: 14px;
+      font-size: 38px;
+    }
+
+    .result-podium {
+      gap: 8px;
+      margin: 18px 0;
+    }
+
+    .result-podium-item {
+      min-height: 94px;
+      padding: 12px 8px;
+      border-radius: 12px;
+    }
+
+    .result-podium-item.place-1 {
+      min-height: 120px;
+    }
+
+    .result-podium-item span {
+      font-size: 18px;
+    }
+
+    .result-podium-item strong {
+      margin-top: 5px;
+      font-size: 20px;
+    }
+
+    .result-podium-item small {
+      margin-top: 5px;
+    }
+
+    .result-message {
+      min-height: 28px;
+      margin: 8px 0 16px;
+      font-size: 18px;
+    }
+
+    .play-again-btn {
+      min-height: 54px;
+      border-radius: 12px;
+      font-size: 20px;
+    }
+
+    .next-race-tip {
+      margin-top: 10px;
+      font-size: 15px;
+    }
+
     .game-car {
       position: relative;
       width: 100%;

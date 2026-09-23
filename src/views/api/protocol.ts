@@ -6,11 +6,10 @@ export interface Result<T = unknown> {
 }
 
 export interface PageResult<T> {
-  pageNum: number;
-  pageSize: number;
-  total: number;
-  totalPage: number;
-  data: T[];
+  currentPage: number;
+  totalRecords: number;
+  totalSize: number;
+  record: T[];
 }
 
 export type RacingStatus = 1 | 2 | 3;

@@ -1,4 +1,4 @@
-import { XEngine, MapEntity, Sharp, Label } from './XEngine';
+import { XEngine, MapEntity, PcRaceTrackEntity, Sharp, Label } from './XEngine';
 import RunEntity from './RunEntity';
 import Car from './Car';
 import Res from './RaceRes';
@@ -85,7 +85,7 @@ class RaceGame {
 
       this.line0.setTargetPosition(newPos, firstRacerTime, realyLefttime);
 
-      this.line1.initPosition(2.5 * firstRacerTime, dataCenter.layout.isMobile ? 140 : 30);
+      this.line1.initPosition(2.5 * firstRacerTime, dataCenter.layout.isMobile ? 140 : 112);
       this.line1.setTargetPosition(this.engine.stageWidth - 390, firstRacerTime, realyLefttime);
     } else {
       let sliceTime = this._totalTime / this._data[0].length;
@@ -104,52 +104,40 @@ class RaceGame {
     );
     this.engine.addChild(this.cityBg);
 
-    // PC 画布现在使用 1720px 高度，必须使用完整高度的赛道纹理。
-    // street_pc 只有 396px 高，继续使用它会让车辆被排开后下方出现大片空白。
-    this.seaBg = new MapEntity(this.engine.getImage(Res.street));
+    this.seaBg = dataCenter.layout.isMobile
+      ? new MapEntity(this.engine.getImage(Res.street))
+      : new PcRaceTrackEntity(this.engine.getImage(Res.street));
     this.engine.addChild(this.seaBg);
     this.seaBg.y = dataCenter.layout.isMobile ? 510 : 100;
-    // 只缩放赛道纹理，不缩放车辆及其轮胎、喷气等子元素。
-    if (!dataCenter.layout.isMobile) {
-      this.seaBg.setContentScale(0.8);
-    }
     this.seaBg.speed = 25;
 
     this.cityBg.speed = 0.6;
 
-    // PC 的 line_pc 仅 400px 高，只能看到上方红白线；使用完整线表素材
-    // 并缩放到 PC 画布比例，确保 1 到 10 号线贯穿整个赛道。
-    this.line0 = new RunEntity(
-      this.engine.getImage(dataCenter.layout.isMobile ? Res.line : Res.line),
-    );
+    this.line0 = new RunEntity(this.engine.getImage(Res.line));
     if (!dataCenter.layout.isMobile) {
-      this.line0.scalex = 0.65;
-      this.line0.scaley = 0.85;
+      this.line0.scalex = 0.8;
+      this.line0.scaley = 0.8;
     }
     this.seaBg.addChild(this.line0);
 
-    const lineY = dataCenter.layout.isMobile ? 140 : 0;
+    const lineY = dataCenter.layout.isMobile ? 140 : 112;
 
     this.line0.initPosition(0, lineY);
 
-    this.num0 = new RunEntity(
-      this.engine.getImage(dataCenter.layout.isMobile ? Res.numat : Res.numat),
-    );
+    this.num0 = new RunEntity(this.engine.getImage(Res.numat));
     if (!dataCenter.layout.isMobile) {
-      this.num0.scalex = 0.65;
-      this.num0.scaley = 0.85;
+      this.num0.scalex = 0.8;
+      this.num0.scaley = 0.8;
     }
     this.seaBg.addChild(this.num0);
-    const numX = dataCenter.layout.isMobile ? 240 : 190;
-    const numY = dataCenter.layout.isMobile ? 140 : 0;
+    const numX = dataCenter.layout.isMobile ? 240 : 192;
+    const numY = dataCenter.layout.isMobile ? 140 : 112;
     this.num0.initPosition(numX, numY);
 
-    this.line1 = new RunEntity(
-      this.engine.getImage(dataCenter.layout.isMobile ? Res.line : Res.line),
-    );
+    this.line1 = new RunEntity(this.engine.getImage(Res.line));
     if (!dataCenter.layout.isMobile) {
-      this.line1.scalex = 0.65;
-      this.line1.scaley = 0.85;
+      this.line1.scalex = 0.8;
+      this.line1.scaley = 0.8;
     }
     this.seaBg.addChild(this.line1);
 
@@ -164,7 +152,12 @@ class RaceGame {
       );
 
       this.seaBg.addChild(b);
-      const carY = dataCenter.layout.isMobile ? 190 : 20;
+      if (!dataCenter.layout.isMobile) {
+        // PC 车辆使用独立比例放大，轮胎、喷气等子元素会同步缩放。
+        b.scalex = 1.5;
+        b.scaley = 1.5;
+      }
+      const carY = dataCenter.layout.isMobile ? 190 : 188;
       b.initPosition(10, carY + gap * i); // 右侧边缘
       b.initDistance(750);
       b.onEnd(this.onCarEnd.bind(this));
@@ -220,7 +213,7 @@ class RaceGame {
     let newPos = currentPos + (targetPos - currentPos) * lerpSpeed;
 
     this.line0.setTargetPosition(newPos, firstRacerTime, realyLefttime);
-    this.line1.initPosition(2.5 * firstRacerTime, dataCenter.layout.isMobile ? 140 : 30);
+    this.line1.initPosition(2.5 * firstRacerTime, dataCenter.layout.isMobile ? 140 : 112);
     this.line1.setTargetPosition(this.engine.stageWidth - 390, firstRacerTime, realyLefttime);
     if (lefttime + firstRacerTime < this._totalTime) {
       this.isRunning = false;
@@ -254,6 +247,7 @@ class RaceGame {
     this.cityBg.unregister();
 
     this.line0.unregister();
+    this.num0.unregister();
     this.line1.unregister();
     for (let i = 0; i < 10; i++) {
       const car = this.cars[i];
@@ -280,6 +274,7 @@ class RaceGame {
     this.sharper.available = false;
     this.cityBg.resetPosition();
     this.line0.resetPosition();
+    this.num0.resetPosition();
     this.line1.resetPosition();
     this.lable.hidden = false;
     this.lable.register();

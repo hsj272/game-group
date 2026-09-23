@@ -55,37 +55,37 @@ import { lang } from '@/lang';
   .pc {
     .gameplay {
       width: 467px;
-      height: 413px;
+      height: 430px;
       background: #1b212b;
       border: 2px solid #ffffff;
       border-radius: 16px;
     }
 
     .gameplay-tip {
-      width: 367px;
-      height: 140px;
+      width: 250px;
+      height: 52px;
       background: linear-gradient(90deg, #e34059 0%, #cc0a43 100%), #e52126;
       border-radius: 10px;
       border: 2px solid #ffffff;
-      margin-top: -30px;
+      margin-top: -20px;
       font-weight: 900;
-      font-size: 20px;
+      font-size: 16px;
       color: #ffffff;
-      line-height: 29px;
+      line-height: 22px;
     }
 
     .gameplay-content {
-      padding: 23px;
+      padding: 22px 23px;
       font-weight: 600;
       font-size: 16px;
       color: #ffffff;
-      line-height: 20px;
+      line-height: 21px;
 
       p {
         font-family: bold;
         font-size: 20px;
-        margin-top: 10px;
-        margin-bottom: 20px;
+        margin-top: 12px;
+        margin-bottom: 14px;
       }
     }
   }
