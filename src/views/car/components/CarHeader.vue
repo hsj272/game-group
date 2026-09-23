@@ -245,7 +245,7 @@ const getColorStyle = (charObj: { char: string; isRank: boolean }) => {
       right: 0;
     }
     .car-content {
-      margin: 12px 15px;
+      margin: 14px 18px;
       overflow: hidden;
     }
     .car-h-row {
@@ -256,15 +256,15 @@ const getColorStyle = (charObj: { char: string; isRank: boolean }) => {
     }
     .car-title {
       font-weight: 900;
-      font-size: 18px;
+      font-size: 22px;
       color: #fff093;
-      line-height: 26px;
+      line-height: 30px;
     }
     .car-subtitle {
       font-weight: bold;
-      font-size: 20px;
+      font-size: 23px;
       color: #ffffff;
-      line-height: 27px;
+      line-height: 30px;
     }
     .record-img {
       width: 28px;
@@ -274,21 +274,21 @@ const getColorStyle = (charObj: { char: string; isRank: boolean }) => {
     }
     .record-row {
       font-weight: bold;
-      font-size: 26px;
+      font-size: 30px;
       color: #ffffff;
-      line-height: 32px;
+      line-height: 36px;
     }
     .car-info {
       border-radius: 10px;
       background: rgba(1, 1, 1, 0.54);
-      padding: 5px 30px 10px 30px;
+      padding: 7px 34px 12px 34px;
       color: #ffffff;
     }
     .car-info-title {
       font-weight: bold;
-      font-size: 20px;
-      line-height: 25px;
-      margin-bottom: 8px;
+      font-size: 23px;
+      line-height: 29px;
+      margin-bottom: 10px;
       word-wrap: break-word;
     }
     .car-img {
@@ -298,15 +298,15 @@ const getColorStyle = (charObj: { char: string; isRank: boolean }) => {
     }
     .car-info-subtitle {
       font-weight: bold;
-      font-size: 26px;
+      font-size: 30px;
       color: #fff093;
-      line-height: 33px;
+      line-height: 38px;
     }
     .later {
       font-weight: bold;
-      font-size: 20px;
+      font-size: 23px;
       color: #f8f8f8;
-      line-height: 27px;
+      line-height: 30px;
       margin-top: 0;
       margin-left: 6px;
     }

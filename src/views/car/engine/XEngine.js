@@ -200,7 +200,7 @@ class Rect {
   clip(rect, box, scalex, scaley) {
     let x = rect.x + box.x - this.x;
     let y = rect.y + box.y - this.y;
-    return new Rect(x / scalex, y / scalex, box.width / scalex, box.height / scaley);
+    return new Rect(x / scalex, y / scaley, box.width / scalex, box.height / scaley);
   }
 }
 class DisplayObject {
@@ -596,6 +596,8 @@ class MapEntity extends Sprite {
     this.speed = 0;
     this.dx = 0;
     this.startx = 0;
+    this.mapScaleX = 1;
+    this.mapScaleY = 1;
   }
   onAddToStage() {
     this.startx = this.dx = this.width - this.game.stageWidth;
@@ -604,7 +606,7 @@ class MapEntity extends Sprite {
     //mapentity直接放舞台
     if (this.rect.isOverlap(rect)) {
       let r = this.rect.cut(rect);
-      let sr = this.rect.clip(this.srcRect, r, 1, 1);
+      let sr = this.rect.clip(this.srcRect, r, this.mapScaleX, this.mapScaleY);
       let sx = sr.x + this.dx;
       if (sx >= this.game.stageWidth) {
         this.dx = 0;

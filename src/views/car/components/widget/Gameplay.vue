@@ -54,7 +54,7 @@ import { lang } from '@/lang';
 @media (min-width: 768px) {
   .pc {
     .gameplay {
-      width: 467px;
+      width: 410px;
       height: 430px;
       background: #1b212b;
       border: 2px solid #ffffff;
@@ -77,7 +77,7 @@ import { lang } from '@/lang';
     .gameplay-content {
       padding: 22px 23px;
       font-weight: 600;
-      font-size: 16px;
+      font-size: 14px;
       color: #ffffff;
       line-height: 21px;
 

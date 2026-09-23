@@ -1,13 +1,8 @@
 <template>
   <div class="records flex-col">
     <div class="row-center">
-      <div
-        v-for="(item, index) in hedBtns"
-        :key="index"
-        class="records-item center"
-        @click="selectBtnId = item.id"
-        :class="{ actives: selectBtnId === item.id }"
-      >
+      <div v-for="(item, index) in hedBtns" :key="index" class="records-item center" @click="selectBtnId = item.id"
+        :class="{ actives: selectBtnId === item.id }">
         {{ item.name }}
       </div>
     </div>
@@ -18,41 +13,27 @@
           每行显示一辆车最近的名次记录；X 表示该场未进入前三名。
         </p>
         <div class="records-num-row">
-          <div
-            class="records-num records-title center"
-            v-for="index in 10"
-            :key="index"
-            :class="{ actives: selectedRecordNum.includes(index) }"
-            @click="
+          <div class="records-num records-title center" v-for="index in 10" :key="index"
+            :class="{ actives: selectedRecordNum.includes(index) }" @click="
               selectedRecOvedId === 5
                 ? selectedRecordNum.includes(index)
                   ? ''
                   : (selectedRecordNum = [index])
                 : ''
-            "
-          >
+              ">
             {{ index }}
           </div>
         </div>
         <div class="records-num-row">
-          <div
-            class="records-oved records-title center"
-            v-for="(item, index) in recOved"
-            :key="index"
+          <div class="records-oved records-title center" v-for="(item, index) in recOved" :key="index"
             :class="{ actives: selectedRecOvedId === item.id }"
-            @click="filteredRecOved.includes(item) ? selectRecOved(item.id) : ''"
-          >
+            @click="filteredRecOved.includes(item) ? selectRecOved(item.id) : ''">
             {{ item.name }}
           </div>
         </div>
         <div class="records-num-row">
-          <div
-            class="records-oved records-title center"
-            v-for="(item, index) in Tracks"
-            :key="index"
-            :class="{ actives: selectedTrackId === item.id }"
-            @click="selectedTrackId = item.id"
-          >
+          <div class="records-oved records-title center" v-for="(item, index) in Tracks" :key="index"
+            :class="{ actives: selectedTrackId === item.id }" @click="selectedTrackId = item.id">
             {{ item.name }}
           </div>
         </div>
@@ -260,6 +241,7 @@ watch(selectBtnId, (newId) => {
   background: #1b212b;
   overflow: hidden;
 }
+
 .records-item {
   width: 385.88px;
   height: 133.41px;
@@ -272,6 +254,7 @@ watch(selectBtnId, (newId) => {
   line-height: 56px;
   margin-right: 53px;
 }
+
 .actives {
   border: none;
   background: linear-gradient(90deg, #e34059 0%, #cc0a43 100%);
@@ -285,6 +268,7 @@ watch(selectBtnId, (newId) => {
   margin-top: 35px;
   margin-left: 100px;
 }
+
 .twosan {
   transform: translateX(500px);
 }
@@ -311,6 +295,7 @@ watch(selectBtnId, (newId) => {
   flex-direction: row;
   justify-content: space-around;
   margin-top: 16px;
+
   .records-title {
     border: 2px solid #a3a8b3;
     border-radius: 7px;
@@ -319,10 +304,12 @@ watch(selectBtnId, (newId) => {
     color: #a3a8b3;
     line-height: 56px;
   }
+
   .records-num {
     width: 78px;
     height: 78px;
   }
+
   .records-oved {
     padding: 15px 37px;
     font-weight: bold;
@@ -354,6 +341,7 @@ watch(selectBtnId, (newId) => {
   line-height: 47px;
   text-align: center;
 }
+
 .ranking-icons {
   display: flex;
   flex-direction: row;
@@ -390,7 +378,7 @@ watch(selectBtnId, (newId) => {
 @media (min-width: 768px) {
   .pc {
     .records {
-      width: 467px;
+      width: 410px;
       height: 540px;
       padding: 22px 20px 28px;
       border-radius: 10px;
@@ -398,6 +386,7 @@ watch(selectBtnId, (newId) => {
       background: #1b212b;
       overflow: hidden;
     }
+
     .records-item {
       width: 158px;
       height: 48px;
@@ -410,6 +399,7 @@ watch(selectBtnId, (newId) => {
       line-height: 26px;
       margin: 0 6px;
     }
+
     .actives {
       border: none;
       background: linear-gradient(90deg, #e34059 0%, #cc0a43 100%);
@@ -423,6 +413,7 @@ watch(selectBtnId, (newId) => {
       margin-top: 12px;
       margin-left: 106px;
     }
+
     .twosan {
       transform: translateX(166px);
     }
@@ -448,22 +439,25 @@ watch(selectBtnId, (newId) => {
       flex-direction: row;
       justify-content: space-around;
       margin-top: 12px;
+
       .records-title {
         border: 2px solid #a3a8b3;
         border-radius: 7px;
         font-weight: bold;
-      font-size: 13px;
+        font-size: 13px;
         color: #a3a8b3;
         line-height: 16px;
       }
+
       .records-num {
         width: 28px;
         height: 28px;
       }
+
       .records-oved {
         padding: 2px 10px;
         font-weight: bold;
-      font-size: 16px;
+        font-size: 16px;
         color: #a3a8b3;
         line-height: 20px;
       }
@@ -491,6 +485,7 @@ watch(selectBtnId, (newId) => {
       line-height: 27px;
       text-align: center;
     }
+
     .ranking-icons {
       display: flex;
       flex-direction: row;

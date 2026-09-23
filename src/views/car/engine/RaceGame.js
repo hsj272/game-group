@@ -6,6 +6,20 @@ import CountDown from './CountDown';
 import dataCenter from '@/dataCenter';
 const SCALES = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 const STARTX = [78, 85, 93, 101.5, 110.5, 119, 128.5, 140, 152, 164];
+const PC_TRACK_SCALE = 0.75;
+const PC_SCENE = {
+  ambienceScaleY: 1.8,
+  // street 原图高 2030；缩放后可在放大的看台下完整显示到底部红白线。
+  trackScale: PC_TRACK_SCALE,
+  trackY: 180,
+  // 车辆独立于赛道缩放，保持车道坐标不变的同时略微放大车身。
+  carScale: 1.5,
+  // 所有位置都由赛道原始坐标按同一比例换算，保证赛车与车道对齐。
+  lineY: 140 * PC_TRACK_SCALE,
+  numberX: 240 * PC_TRACK_SCALE,
+  carY: 200 * PC_TRACK_SCALE,
+  laneGap: ((2030 - 2) / 11) * PC_TRACK_SCALE,
+};
 class RaceGame {
   constructor(element) {
     this._data = [];
@@ -45,9 +59,22 @@ class RaceGame {
   }
   startLaunch() {
     if (this.isDestoryed || this.isRunning) return;
-    const launchData = Array.from({ length: 10 }, () =>
-      Array.from({ length: 8 }, () => 0.125),
+    // 每次发车随机加入轻微差异，避免每一局都是相同的起步顺序；后端数据到达后会平滑接管。
+    const launchVariance = dataCenter.layout.isMobile ? 0.035 : 0.02;
+    const launchOffsets = Array.from(
+      { length: 10 },
+      () => (Math.random() * 2 - 1) * launchVariance,
     );
+    const launchData = launchOffsets.map((offset) => [
+      0.125 + offset,
+      0.125 - offset,
+      0.125,
+      0.125,
+      0.125,
+      0.125,
+      0.125,
+      0.125,
+    ]);
     this.setData(this._totalTime, 7, launchData);
     this.run(null);
   }
@@ -85,7 +112,10 @@ class RaceGame {
 
       this.line0.setTargetPosition(newPos, firstRacerTime, realyLefttime);
 
-      this.line1.initPosition(2.5 * firstRacerTime, dataCenter.layout.isMobile ? 140 : 112);
+      this.line1.initPosition(
+        2.5 * firstRacerTime,
+        dataCenter.layout.isMobile ? 140 : PC_SCENE.lineY,
+      );
       this.line1.setTargetPosition(this.engine.stageWidth - 390, firstRacerTime, realyLefttime);
     } else {
       let sliceTime = this._totalTime / this._data[0].length;
@@ -102,46 +132,55 @@ class RaceGame {
     this.cityBg = new MapEntity(
       this.engine.getImage(dataCenter.layout.isMobile ? Res.city : Res.city_pc),
     );
+    // PC 端扩大看台与闪光灯的纵向存在感，同时把赛道整体向下让出空间。
+    const pcScene = dataCenter.layout.isMobile ? null : PC_SCENE;
+    if (pcScene) {
+      this.cityBg.mapScaleY = pcScene.ambienceScaleY;
+      this.cityBg.height = this.cityBg.image.height * pcScene.ambienceScaleY;
+    }
     this.engine.addChild(this.cityBg);
 
     this.seaBg = dataCenter.layout.isMobile
       ? new MapEntity(this.engine.getImage(Res.street))
-      : new PcRaceTrackEntity(this.engine.getImage(Res.street));
+      : new PcRaceTrackEntity(this.engine.getImage(Res.street), pcScene.trackScale);
     this.engine.addChild(this.seaBg);
-    this.seaBg.y = dataCenter.layout.isMobile ? 510 : 100;
+    this.seaBg.y = dataCenter.layout.isMobile ? 510 : pcScene.trackY;
     this.seaBg.speed = 25;
 
     this.cityBg.speed = 0.6;
 
     this.line0 = new RunEntity(this.engine.getImage(Res.line));
     if (!dataCenter.layout.isMobile) {
-      this.line0.scalex = 0.8;
-      this.line0.scaley = 0.8;
+      this.line0.scalex = pcScene.trackScale;
+      this.line0.scaley = pcScene.trackScale;
     }
     this.seaBg.addChild(this.line0);
 
-    const lineY = dataCenter.layout.isMobile ? 140 : 112;
+    const lineY = dataCenter.layout.isMobile ? 140 : pcScene.lineY;
 
     this.line0.initPosition(0, lineY);
 
     this.num0 = new RunEntity(this.engine.getImage(Res.numat));
     if (!dataCenter.layout.isMobile) {
-      this.num0.scalex = 0.8;
-      this.num0.scaley = 0.8;
+      this.num0.scalex = pcScene.trackScale;
+      this.num0.scaley = pcScene.trackScale;
     }
     this.seaBg.addChild(this.num0);
-    const numX = dataCenter.layout.isMobile ? 240 : 192;
-    const numY = dataCenter.layout.isMobile ? 140 : 112;
+    const numX = dataCenter.layout.isMobile ? 240 : pcScene.numberX;
+    const numY = dataCenter.layout.isMobile ? 140 : pcScene.lineY;
     this.num0.initPosition(numX, numY);
 
     this.line1 = new RunEntity(this.engine.getImage(Res.line));
     if (!dataCenter.layout.isMobile) {
-      this.line1.scalex = 0.8;
-      this.line1.scaley = 0.8;
+      this.line1.scalex = pcScene.trackScale;
+      this.line1.scaley = pcScene.trackScale;
     }
     this.seaBg.addChild(this.line1);
 
-    const gap = (this.engine.stageHeight - this.seaBg.y) / 11; //计算每个车的间距
+    // PC 端使用固定的紧凑间距，避免看台放大后最后一条车道落到画布之外。
+    const gap = dataCenter.layout.isMobile
+      ? (this.engine.stageHeight - this.seaBg.y) / 11
+      : pcScene.laneGap;
     for (let i = 0; i < 10; i++) {
       // let b = new Car(
       //   this.engine.getImage(Res['car' + i + (dataCenter.layout.isMobile ? '' : '_pc')]),
@@ -154,12 +193,14 @@ class RaceGame {
       this.seaBg.addChild(b);
       if (!dataCenter.layout.isMobile) {
         // PC 车辆使用独立比例放大，轮胎、喷气等子元素会同步缩放。
-        b.scalex = 1.5;
-        b.scaley = 1.5;
+        b.scalex = pcScene.carScale;
+        b.scaley = pcScene.carScale;
       }
-      const carY = dataCenter.layout.isMobile ? 190 : 188;
-      b.initPosition(10, carY + gap * i); // 右侧边缘
-      b.initDistance(750);
+      const carY = dataCenter.layout.isMobile ? 190 : pcScene.carY;
+      // 移动端起步线更靠近车头，使用 x=0 避免赛车初始时越过线；PC 保持原位置。
+      b.initPosition(dataCenter.layout.isMobile ? 0 : 10, carY + gap * i); // 右侧边缘
+      // PC 终点线相对更靠右，增加终点行驶距离，确保结束时车身能碰到线。
+      b.initDistance(dataCenter.layout.isMobile ? 780 : 845);
       b.onEnd(this.onCarEnd.bind(this));
       b.setUserCar(this.userCarNumbers.has(i + 1));
       this.cars.push(b);
@@ -213,7 +254,10 @@ class RaceGame {
     let newPos = currentPos + (targetPos - currentPos) * lerpSpeed;
 
     this.line0.setTargetPosition(newPos, firstRacerTime, realyLefttime);
-    this.line1.initPosition(2.5 * firstRacerTime, dataCenter.layout.isMobile ? 140 : 112);
+    this.line1.initPosition(
+      2.5 * firstRacerTime,
+      dataCenter.layout.isMobile ? 140 : PC_SCENE.lineY,
+    );
     this.line1.setTargetPosition(this.engine.stageWidth - 390, firstRacerTime, realyLefttime);
     if (lefttime + firstRacerTime < this._totalTime) {
       this.isRunning = false;

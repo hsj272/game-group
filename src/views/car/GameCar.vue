@@ -974,8 +974,8 @@ document.addEventListener('visibilitychange', function () {
 
     .live-ranking {
       top: 120px;
-      right: 16px;
-      width: 220px;
+      right: 0;
+      width: 210px;
       padding: 12px;
       border-radius: 14px;
     }

@@ -18,7 +18,8 @@ class Car extends Entity {
     this.timer = 0;
     this.syncOffsetX = 0;
     this.syncTimeLeft = 0;
-    this.syncDuration =  1200;
+    // 后端排名到达后的追赶时长会根据实际差距动态计算。
+    this.syncDuration = 2600;
     this.isUserCar = false;
 
     this.wheel1 = new Entity(dataCenter.layout.isMobile ? Res.wheel : Res.wheel_pc);
@@ -69,6 +70,8 @@ class Car extends Entity {
       this.ox + this.distance * rate * 4 - (elapsedTime * this.distance * 3) / firstRacerTime;
 
     this.syncOffsetX = currentX - officialX;
+    // 差距越大，给赛车更长的追赶时间，避免突然加速；小差距则更快完成校准。
+    this.syncDuration = Math.max(2200, Math.min(4500, 2200 + Math.abs(this.syncOffsetX) * 4));
     this.syncTimeLeft = this.syncDuration;
   }
   initPosition(x, y) {
