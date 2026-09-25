@@ -17,9 +17,9 @@ class SoundManager {
   private _activePlayers: SoundPlayer[] = [];
   loadResources(urls: string[]) {
     const waitList = urls.filter((url) => !this.map[url] || !this.map[url].success);
-    waitList.map(this.loadSound);
+    return Promise.all(waitList.map(this.loadSound));
   }
-  play(url: string, times = 1, muted = true) {
+  play(url: string, times = 1, muted = true, volume = 0.5, startAt = 0) {
     return this.loadSound(url).then((entity) => {
       const audio = entity.element;
       audio.pause();
@@ -28,7 +28,8 @@ class SoundManager {
       }
 
       // 控制是否静音
-      audio.volume = muted ? 0 : 0.5; // muted 为 true 时静音，false 时音量为 0.5
+      audio.volume = muted ? 0 : volume;
+      audio.currentTime = startAt;
 
       audio.play();
       this._keepAlives.push(audio);
@@ -78,7 +79,6 @@ class SoundManager {
       gainNode.gain.value = 0.5;
     }
     audio.volume = 0.5;
-    audio.play();
     const promise = new Promise<SoundEntity>((resolve) => {
       audio.oncanplay = () => {
         entity.loading = false;

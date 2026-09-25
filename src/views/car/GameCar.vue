@@ -66,6 +66,7 @@ import backgroundMusic from '@/assets/events/car/gamy.mp3';
 import xm3272 from '@/assets/events/car/xm3272.wav';
 import dataCenter from '@/dataCenter';
 import { RacingSocket } from '@/manager/racingSocket';
+import { raceAudio } from '@/manager/raceAudio';
 const route = useRoute();
 const router = useRouter();
 const startGameData = ref<StartMatchResp>();
@@ -81,6 +82,7 @@ let racingSocket: RacingSocket | undefined;
 let isChangingRace = false;
 let isStartingRace = false;
 let raceStartRetryTimer = 0;
+let launchSoundPlayed = false;
 //游戏开始了
 const isStartCar = ref(false);
 const isFinalSprint = ref(false);
@@ -91,6 +93,7 @@ const selectedCars = ref<number[]>([]);
 const raceNotice = ref('');
 const raceTopThree = computed(() => carGame.paihangValue.slice(0, 3));
 let previousRanking: number[] = [];
+let lastOvertakeSoundAt = 0;
 interface CarGame {
   /**倒计时 */
   outTimeValue: string;
@@ -143,7 +146,10 @@ onMounted(async () => {
   raceGame.value?.resetGame();
   raceGame.value?.initTotalTime(21579);
   const mask = ~(1 << 31);
-  soundManager.play(backgroundMusic, mask, false);
+  // 提前加载倒计时结束音，避免归零后才下载 8 秒音频造成明显延迟。
+  void soundManager.loadResources([xm3272]);
+  // 背景音乐压低，为引擎、超车和冲线提示留出听感空间。
+  soundManager.play(backgroundMusic, mask, false, 0.05);
   try {
     const config = await fetchRacingConfig();
     dataCenter.bettingConfig.update(config);
@@ -169,6 +175,7 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  raceAudio.stopAll();
   soundManager.stopAll();
   clearInterval(countdownData.timer);
   clearInterval(countdownTimer.value);
@@ -233,7 +240,6 @@ function updateTimes() {
     // 旧版画布 3、2、1 倒计时，暂时停用；需要恢复时取消下面两行注释。
     // raceGame.value?.startCount();
     // raceGame.value?.countDown(4000);
-    soundManager.play(xm3272, 1, false);
     startCar();
   }
   if (leftSecond <= 0) {
@@ -242,6 +248,12 @@ function updateTimes() {
     carGame.outTimeValue = '';
     isBettingLocked.value = true;
     preStartText.value = '开始';
+    // 倒计时完成后才播放发车提示，避免音效提前覆盖 3、2、1。
+    // 文件前 3 秒是淡入段，从有效声音段开始，避免归零后还要等待才听到发车声。
+    if (!launchSoundPlayed) {
+      launchSoundPlayed = true;
+      soundManager.play(xm3272, 1, false, 0.35, 3.1);
+    }
     clearTimeout(preStartHideTimer);
     raceGame.value?.startLaunch();
     isStartCar.value = true;
@@ -334,6 +346,11 @@ function updateRaceFeedback(ranking: number[]) {
   });
 
   if (improvedCar) {
+    const now = performance.now();
+    if (now - lastOvertakeSoundAt > 700) {
+      raceAudio.playOvertake();
+      lastOvertakeSoundAt = now;
+    }
     const position = ranking.indexOf(improvedCar) + 1;
     raceNotice.value = `${improvedCar}号车升至第${position}名`;
     clearTimeout(raceNoticeTimer);
@@ -452,6 +469,8 @@ function goToNextRace() {
     .then(() => {
       raceGame.value?.resetGame();
       previousRanking = [];
+      lastOvertakeSoundAt = 0;
+      launchSoundPlayed = false;
       isFinalSprint.value = false;
       isResultVisible.value = false;
       resultSeconds.value = 3;
@@ -478,6 +497,8 @@ function goToNextRace() {
 function showRaceResult(ranking?: number[]) {
   if (ranking?.length) carGame.paihangValue = [...ranking];
   if (isResultVisible.value || resultRevealTimer) return;
+
+  raceAudio.playFinish();
 
   // RaceGame 会先执行冲线闪光，再显示结果面板，避免面板提前盖住冲线效果。
   resultRevealTimer = window.setTimeout(() => {
