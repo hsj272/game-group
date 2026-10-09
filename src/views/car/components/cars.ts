@@ -1,13 +1,13 @@
-import car0 from '@/assets/cars/car10.png';
-import car1 from '@/assets/cars/car1.png';
-import car2 from '@/assets/cars/car2.png';
-import car3 from '@/assets/cars/car3.png';
-import car4 from '@/assets/cars/car4.png';
-import car5 from '@/assets/cars/car5.png';
-import car6 from '@/assets/cars/car6.png';
-import car7 from '@/assets/cars/car7.png';
-import car8 from '@/assets/cars/car8.png';
-import car9 from '@/assets/cars/car9.png';
+import car0 from '@/assets/newnew_cars/10.png';
+import car1 from '@/assets/newnew_cars/1.png';
+import car2 from '@/assets/newnew_cars/2.png';
+import car3 from '@/assets/newnew_cars/3.png';
+import car4 from '@/assets/newnew_cars/4.png';
+import car5 from '@/assets/newnew_cars/5.png';
+import car6 from '@/assets/newnew_cars/6.png';
+import car7 from '@/assets/newnew_cars/7.png';
+import car8 from '@/assets/newnew_cars/8.png';
+import car9 from '@/assets/newnew_cars/9.png';
 export default {
   car0,
   car1,

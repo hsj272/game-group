@@ -607,12 +607,29 @@ class MapEntity extends Sprite {
     if (this.rect.isOverlap(rect)) {
       let r = this.rect.cut(rect);
       let sr = this.rect.clip(this.srcRect, r, this.mapScaleX, this.mapScaleY);
-      let sx = sr.x + this.dx;
-      if (sx >= this.game.stageWidth) {
-        this.dx = 0;
-        sx += this.dx;
+      const imageWidth = this.image.width;
+      let sx = ((sr.x + this.dx) % imageWidth + imageWidth) % imageWidth;
+      let remaining = sr.width;
+      let targetX = r.x;
+      // 背景到达右边缘后从图片左侧无缝接续，避免出现透明/黑色断层。
+      while (remaining > 0) {
+        const sourceWidth = Math.min(remaining, imageWidth - sx);
+        const targetWidth = sourceWidth * this.mapScaleX;
+        ctx.drawImage(
+          this.image,
+          sx,
+          sr.y,
+          sourceWidth,
+          sr.height,
+          targetX,
+          r.y,
+          targetWidth,
+          r.height,
+        );
+        remaining -= sourceWidth;
+        targetX += targetWidth;
+        sx = 0;
       }
-      ctx.drawImage(this.image, sx, sr.y, sr.width, sr.height, r.x, r.y, r.width, r.height);
     }
     super.draw(ctx, rect);
   }

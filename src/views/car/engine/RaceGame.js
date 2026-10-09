@@ -6,14 +6,16 @@ import CountDown from './CountDown';
 import dataCenter from '@/dataCenter';
 const SCALES = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 const STARTX = [78, 85, 93, 101.5, 110.5, 119, 128.5, 140, 152, 164];
-const PC_TRACK_SCALE = 0.75;
+const PC_TRACK_SCALE = 0.68;
 const PC_SCENE = {
-  ambienceScaleY: 1.8,
+  // 新上背景原图高 159px，PC 端放大到约 180px，保持原来顶部背景的视觉高度。
+  ambienceScaleY: 1.77,
   // street 原图高 2030；缩放后可在放大的看台下完整显示到底部红白线。
   trackScale: PC_TRACK_SCALE,
-  trackY: 180,
+  trackY: 280,
   // 车辆独立于赛道缩放，保持车道坐标不变的同时略微放大车身。
-  carScale: 1.5,
+  // PC 端直接使用移动端原图，再整体缩小；赛车、轮胎和喷气会同步缩放。
+  carScale: 0.84,
   // 所有位置都由赛道原始坐标按同一比例换算，保证赛车与车道对齐。
   lineY: 140 * PC_TRACK_SCALE,
   numberX: 240 * PC_TRACK_SCALE,
@@ -139,12 +141,14 @@ class RaceGame {
       this.cityBg.height = this.cityBg.image.height * pcScene.ambienceScaleY;
     }
     this.engine.addChild(this.cityBg);
+    // 背景首次显示从图片最左侧开始，比赛开始后由 speed 推动向右移动。
+    this.cityBg.startx = this.cityBg.dx = 0;
 
     this.seaBg = dataCenter.layout.isMobile
       ? new MapEntity(this.engine.getImage(Res.street))
       : new PcRaceTrackEntity(this.engine.getImage(Res.street), pcScene.trackScale);
     this.engine.addChild(this.seaBg);
-    this.seaBg.y = dataCenter.layout.isMobile ? 510 : pcScene.trackY;
+    this.seaBg.y = dataCenter.layout.isMobile ? 530 : pcScene.trackY;
     this.seaBg.speed = 25;
 
     this.cityBg.speed = 0.6;

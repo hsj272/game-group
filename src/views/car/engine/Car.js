@@ -24,22 +24,28 @@ class Car extends Entity {
 
     this.wheel1 = new Entity(dataCenter.layout.isMobile ? Res.wheel : Res.wheel_pc);
 
-    this.wheel1.x = dataCenter.layout.isMobile ? 33 : 13;
-    this.wheel1.y = dataCenter.layout.isMobile ? 55 : 21;
+    // 后轮挂点：x 增大向右，y 增大向下；向左/向上调小对应坐标。
+    // 前面的数值是移动端，后面的数值是 PC 端。
+    this.wheel1.x = dataCenter.layout.isMobile ? 38 : 37;
+    this.wheel1.y = dataCenter.layout.isMobile ? 31 : 31;
     this.addChild(this.wheel1);
-    this.wheel2 = new Entity(dataCenter.layout.isMobile ? Res.wheel : Res.wheel_pc);
-    this.wheel2.x = dataCenter.layout.isMobile ? 198 : 84;
-    this.wheel2.y = dataCenter.layout.isMobile ? 54 : 22;
+    this.wheel2 = new Entity(dataCenter.layout.isMobile ? Res.wheelFront : Res.wheelFront_pc);
+    // 前轮挂点：x 增大向右，y 增大向下；向左/向上调小对应坐标。
+    // 前面的数值是移动端，后面的数值是 PC 端。
+    this.wheel2.x = dataCenter.layout.isMobile ? 192 : 192;
+    this.wheel2.y = dataCenter.layout.isMobile ? 31 : 31;
     this.addChild(this.wheel2);
 
     this.water = new Entity(Res.going);
     this.water.hidden = true;
-    this.water.y = dataCenter.layout.isMobile ? 68 : 22;
-    this.water.x = dataCenter.layout.isMobile ? -30 : -38;
+    // 水花喷气：y 减小向上，前面的数值是移动端，后面的数值是 PC 端。
+    this.water.y = dataCenter.layout.isMobile ? 45 : 45;
+    this.water.x = dataCenter.layout.isMobile ? -30 : -30;
     this.addChild(this.water);
     this.quick = new Entity(Res.running);
     this.quick.hidden = true;
-    this.quick.y = dataCenter.layout.isMobile ? 70 : 30;
+    // 加速喷气：y 减小向上，前面的数值是移动端，后面的数值是 PC 端。
+    this.quick.y = dataCenter.layout.isMobile ? 50 : 50;
     this.quick.x = dataCenter.layout.isMobile ? -28 : -28;
     this.addChild(this.quick);
   }
