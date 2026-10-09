@@ -607,12 +607,23 @@ class MapEntity extends Sprite {
     if (this.rect.isOverlap(rect)) {
       let r = this.rect.cut(rect);
       let sr = this.rect.clip(this.srcRect, r, this.mapScaleX, this.mapScaleY);
-      let sx = sr.x + this.dx;
-      if (sx >= this.game.stageWidth) {
-        this.dx = 0;
-        sx += this.dx;
+      const imageWidth = this.image.width;
+      const sx = ((sr.x + this.dx) % imageWidth + imageWidth) % imageWidth;
+      const firstWidth = Math.min(sr.width, imageWidth - sx);
+      ctx.drawImage(this.image, sx, sr.y, firstWidth, sr.height, r.x, r.y, firstWidth, r.height);
+      if (firstWidth < sr.width) {
+        ctx.drawImage(
+          this.image,
+          0,
+          sr.y,
+          sr.width - firstWidth,
+          sr.height,
+          r.x + firstWidth,
+          r.y,
+          sr.width - firstWidth,
+          r.height,
+        );
       }
-      ctx.drawImage(this.image, sx, sr.y, sr.width, sr.height, r.x, r.y, r.width, r.height);
     }
     super.draw(ctx, rect);
   }
@@ -636,33 +647,32 @@ class PcRaceTrackEntity extends MapEntity {
     this.loopWidth = 0;
   }
   onAddToStage() {
-    this.loopWidth = this.game.stageWidth / this.trackScale;
+    this.loopWidth = this.image.width;
     this.startx = this.dx = 0;
   }
   draw(ctx, rect) {
     if (this.rect.isOverlap(rect)) {
       const r = this.rect.cut(rect);
-      const sourceX = (r.x - this.rect.x) / this.trackScale + this.dx;
+      const sourceX =
+        (((r.x - this.rect.x) / this.trackScale + this.dx) % this.image.width +
+          this.image.width) %
+        this.image.width;
       const sourceY = (r.y - this.rect.y) / this.trackScale;
       const sourceWidth = r.width / this.trackScale;
       const sourceHeight = r.height / this.trackScale;
-      ctx.drawImage(
-        this.image,
-        sourceX,
-        sourceY,
-        sourceWidth,
-        sourceHeight,
-        r.x,
-        r.y,
-        r.width,
-        r.height,
-      );
+      const firstWidth = Math.min(sourceWidth, this.image.width - sourceX);
+      const destFirstWidth = firstWidth * this.trackScale;
+      ctx.drawImage(this.image, sourceX, sourceY, firstWidth, sourceHeight, r.x, r.y, destFirstWidth, r.height);
+      if (firstWidth < sourceWidth) {
+        const secondWidth = sourceWidth - firstWidth;
+        ctx.drawImage(this.image, 0, sourceY, secondWidth, sourceHeight, r.x + destFirstWidth, r.y, secondWidth * this.trackScale, r.height);
+      }
     }
     DisplayObject.prototype.draw.call(this, ctx, rect);
   }
   update(dt) {
     this.dx += (this.speed * dt) / 10;
-    if (this.dx >= this.loopWidth) this.dx %= this.loopWidth;
+    if (this.dx >= this.image.width) this.dx %= this.image.width;
     this.involidate();
   }
 }

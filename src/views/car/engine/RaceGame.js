@@ -11,9 +11,9 @@ const PC_SCENE = {
   ambienceScaleY: 1.8,
   // street 原图高 2030；缩放后可在放大的看台下完整显示到底部红白线。
   trackScale: PC_TRACK_SCALE,
-  trackY: 180,
+  trackY: 160,
   // 车辆独立于赛道缩放，保持车道坐标不变的同时略微放大车身。
-  carScale: 1.5,
+  carScale: 0.84,
   // 所有位置都由赛道原始坐标按同一比例换算，保证赛车与车道对齐。
   lineY: 140 * PC_TRACK_SCALE,
   numberX: 240 * PC_TRACK_SCALE,
@@ -195,8 +195,11 @@ class RaceGame {
         // PC 车辆使用独立比例放大，轮胎、喷气等子元素会同步缩放。
         b.scalex = pcScene.carScale;
         b.scaley = pcScene.carScale;
+      } else {
+        // 新赛车素材高度较薄，移动端按原车辆高度纵向拉伸，避免车身显得扁平。
+        b.scaley = 1.35;
       }
-      const carY = dataCenter.layout.isMobile ? 190 : pcScene.carY;
+      const carY = dataCenter.layout.isMobile ? 210 : pcScene.carY;
       // 移动端起步线更靠近车头，使用 x=0 避免赛车初始时越过线；PC 保持原位置。
       b.initPosition(dataCenter.layout.isMobile ? 0 : 10, carY + gap * i); // 右侧边缘
       // PC 终点线相对更靠右，增加终点行驶距离，确保结束时车身能碰到线。
