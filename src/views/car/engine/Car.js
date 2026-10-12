@@ -158,20 +158,16 @@ class Car extends Entity {
       return;
     }
     this.leftTime -= dt;
-    let espt = this.totalTime - this.leftTime;
-    if (espt >= this.firstRacerTime) {
-      espt = this.firstRacerTime;
-    }
-
-    let index = Math.floor(espt / this.sliceTime);
+    const espt = Math.max(0, Math.min(this.totalTime - this.leftTime, this.firstRacerTime));
+    const reachedEnd = espt >= this.firstRacerTime;
+    const index = Math.min(Math.floor(espt / this.sliceTime), this.sliceCount - 1);
     let rate = 0;
-    let i = 0;
-    for (; i < index; i++) {
+    for (let i = 0; i < index; i++) {
       rate += this.slices[i];
     }
-    rate += (this.slices[i] * (espt % this.sliceTime)) / this.sliceTime;
+    rate += this.slices[index] * (reachedEnd ? 1 : (espt % this.sliceTime) / this.sliceTime);
 
-    if (rate > 0.999) {
+    if (reachedEnd) {
       this.isFinished = true;
     }
 

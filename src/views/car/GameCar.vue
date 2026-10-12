@@ -9,7 +9,7 @@
         :class="{ selected: selectedCars.includes(carNumber) }">
         <span class="position">{{ index + 1 }}</span>
         <strong>{{ carNumber }}号车</strong>
-        <em v-if="selectedCars.includes(carNumber)">我的车</em>
+        <em v-if="selectedCars.includes(carNumber)">已选</em>
       </div>
     </div>
     <Transition name="race-notice">
@@ -34,7 +34,7 @@
             :class="[`place-${index + 1}`, { selected: selectedCars.includes(carNumber) }]">
             <span>#{{ index + 1 }}</span>
             <strong>{{ carNumber }}号车</strong>
-            <small v-if="selectedCars.includes(carNumber)">我的车</small>
+            <small v-if="selectedCars.includes(carNumber)">已选</small>
           </div>
         </div>
         <p class="result-message">{{ resultMessage }}</p>
@@ -278,11 +278,10 @@ function updateTimes() {
 function createAccurateCountdown(
   endTime: string,
   remainingTime: number,
-  paihang: number[],
+  distancesRatio: number[][],
 
   onEnd?: () => void,
 ) {
-  const suduData = generateSpeedArray(paihang);
   const endTimestamp = convertTime(endTime); // 结束时间的时间戳
   const startTimestamp = convertTime(endTime) - remainingTime; // 当前时间戳
   const targetTimestamp = Math.min(endTimestamp, startTimestamp + remainingTime); // 实际倒计时结束时间
@@ -291,7 +290,7 @@ function createAccurateCountdown(
     const now = getCurrentTime(); // 当前时间戳
     const timeLeft = Math.max(targetTimestamp - now, 0); // 实时计算剩余时间
 
-    const liveRanking = calculateRank(21579, timeLeft, suduData);
+    const liveRanking = calculateRank(21579, timeLeft, distancesRatio);
     carGame.paihangValue = liveRanking;
     updateRaceFeedback(liveRanking);
     isFinalSprint.value = timeLeft > 0 && timeLeft <= 5000;
@@ -325,10 +324,23 @@ function runCar(
   isBettingLocked.value = true;
   const remainingSeconds = Math.min(remainingTimer, 21579);
 
-  const suduData = generateSpeedArray(ranking.rankings);
-  raceGame.value?.applyRaceData(remainingSeconds, 7, suduData);
+  const distancesRatio = ranking.distancesRatio;
+  if (
+    !Array.isArray(distancesRatio) ||
+    distancesRatio.length !== 10 ||
+    !distancesRatio[0]?.length ||
+    distancesRatio.some(
+      (slices) =>
+        !Array.isArray(slices) ||
+        slices.length !== distancesRatio[0].length ||
+        slices.some((ratio) => !Number.isFinite(ratio) || ratio < 0),
+    )
+  ) {
+    throw new Error('比赛距离数据无效');
+  }
+  raceGame.value?.applyRaceData(remainingSeconds, distancesRatio[0].length - 1, distancesRatio);
 
-  createAccurateCountdown(endTime, remainingSeconds, ranking.rankings, () => {
+  createAccurateCountdown(endTime, remainingSeconds, distancesRatio, () => {
     showRaceResult(ranking.rankings);
   });
 }
@@ -570,37 +582,6 @@ function calculateRank(totalTimer: number, remainingTimer: number, distancesRati
     .map((item) => item.index + 1);
 
   return ranking;
-}
-
-/** 根据排名生成速度数组 */
-function generateSpeedArray(rank: number[]): number[][] {
-  const baseScores = [
-    [0.2, 0.06, 0.05, 0.02, 0.01, 0.03, 0.24, 0.29],
-    [0.21, 0.13, 0.18, 0.01, 0.24, 0.17, 0.02, 0.04],
-    [0.22, 0.05, 0.2, 0.17, 0.01, 0.01, 0.06, 0.03],
-    [0.21, 0.01, 0.02, 0.25, 0.07, 0.24, 0.14, 0.01],
-    [0.18, 0.04, 0.11, 0.01, 0.22, 0.15, 0.07, 0.11],
-    [0.14, 0.17, 0.14, 0.04, 0.06, 0.12, 0.06, 0.19],
-    [0.13, 0.17, 0, 0.05, 0.11, 0.12, 0.06, 0.09],
-    [0.03, 0.03, 0.15, 0.09, 0.03, 0.01, 0.15, 0.41],
-    [0.23, 0.08, 0.05, 0.01, 0.13, 0.06, 0.07, 0.23],
-    [0.05, 0.12, 0.02, 0.09, 0.22, 0.13, 0.07, 0.27],
-  ];
-
-  const scores = [...baseScores];
-  const totalSpeed = baseScores.map((carScores) => {
-    return carScores.reduce((acc, score) => acc + score, 0);
-  });
-  const carRanked = totalSpeed.map((speed, index) => ({
-    index,
-    speed,
-  }));
-  carRanked.sort((a, b) => b.speed - a.speed);
-  rank.forEach((rankIndex, i) => {
-    const sortedIndex = carRanked[i].index;
-    scores[rankIndex - 1] = baseScores[sortedIndex];
-  });
-  return scores;
 }
 
 document.addEventListener('visibilitychange', function () {
